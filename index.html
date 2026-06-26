@@ -228,8 +228,18 @@ tbody td{padding:10px 12px;vertical-align:middle}
 </div>
 <div id="content">
 
+<!-- ACCUEIL -->
+<div class="page active" id="p-home">
+  <div class="pg-title">📊 Tableau de bord</div>
+  <div class="kpi-row" id="home-kpis"></div>
+  <div class="card"><div class="card-ttl">⏰ Échéances à surveiller (60 j)</div><div id="home-echeances"></div></div>
+  <div class="card"><div class="card-ttl">🛣️ Activité</div><div id="home-activite"></div></div>
+  <div class="card"><div class="card-ttl">👥 Commercial</div><div id="home-commercial"></div></div>
+  <div class="card"><div class="card-ttl">⛽ Carburant & marge</div><div id="home-marge"></div></div>
+</div>
+
 <!-- DEVIS -->
-<div class="page active" id="p-devis">
+<div class="page" id="p-devis">
   <div class="pg-title">📄 Nouveau Devis</div>
   <div class="act-row">
     <div class="act-btn act-off" id="dv-a-wf" onclick="dvAct('wf')">🌾 Walking Floor</div>
@@ -253,7 +263,58 @@ tbody td{padding:10px 12px;vertical-align:middle}
       <button id="dv-btn-aligner" onclick="dvAlignerMarche()" style="display:none;margin-top:6px;width:100%;padding:9px;border:none;border-radius:8px;background:var(--navy3);color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.6px;cursor:pointer">🎯 Aligner sur tarif marché moyen</button>
     </div>
   </div>
-  <div class="card" id="dv-sc-wf" style="display:none"><div class="card-ttl">⛽ Surcharges HVO100 / Attente</div><div class="g2"><div class="fg"><label>Carburant HVO100 €</label><input id="dv-wf-carbu" type="number" value="0" inputmode="decimal"></div><div class="fg"><label>Attente après 1h (h)</label><input id="dv-wf-atth" type="number" value="0" step="0.5" min="0" inputmode="decimal"></div></div><div class="fg"><label>Taux horaire €/h</label><input id="dv-wf-attx" type="number" value="55" inputmode="decimal"></div></div>
+  <div class="card">
+    <div class="card-ttl">📦 Chargement partiel (groupage)</div>
+    <label class="sc-item" style="margin-bottom:10px"><input type="checkbox" id="dv-grp-on" onchange="dvCalc()"><div><div style="font-weight:600">Camion non complet</div><div style="font-size:11px;color:var(--grey)">Facturer la part du camion occupée, pas le trajet complet</div></div></label>
+    <div class="g2">
+      <div class="fg"><label>Type de palette</label><select id="dv-grp-type" onchange="grpType('dv')">
+        <option value="0.4">Europe 80×120 (0,40 ml)</option>
+        <option value="0.5">Industrielle 100×120 (0,50 ml)</option>
+        <option value="0.5">Big bag 100×100 (0,50 ml)</option>
+        <option value="0.6">Demi-palette / autre</option>
+      </select></div>
+      <div class="fg"><label>Nombre de palettes</label><input id="dv-grp-npal" type="number" value="8" min="1" inputmode="numeric" oninput="dvCalc()"></div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>ml plancher / palette</label><input id="dv-grp-pml" type="number" value="0.4" step="0.05" inputmode="decimal" oninput="dvCalc()"></div>
+      <div class="fg"><label>Capacité plancher (ml)</label><input id="dv-grp-cap" type="number" value="13.6" step="0.1" inputmode="decimal" oninput="dvCalc()"></div>
+    </div>
+    <div class="sc-list"><label class="sc-item"><input type="checkbox" id="dv-grp-gerb" onchange="dvCalc()"> Palettes gerbables (×2 en hauteur)</label></div>
+    <div class="sc-list"><label class="sc-item"><input type="checkbox" id="dv-grp-deg" onchange="dvCalc()"><div><div style="font-weight:600">Tarif dégressif au poids</div><div style="font-size:11px;color:var(--grey)">Payant-pour : max(poids réel, ml × équivalence) + barème dégressif</div></div></label></div>
+    <div class="g2">
+      <div class="fg"><label>Poids total du lot (kg)</label><input id="dv-grp-poids" type="number" value="0" inputmode="numeric" oninput="dvCalc()"></div>
+      <div class="fg"><label>Équivalence ml → kg</label><input id="dv-grp-eqv" type="number" value="1750" step="50" inputmode="numeric" oninput="dvCalc()"></div>
+    </div>
+    <div class="fg"><label>Minimum facturé €</label><input id="dv-grp-min" type="number" value="0" inputmode="decimal" oninput="dvCalc()"></div>
+  </div>
+  <div class="card" id="dv-sc-wf" style="display:none">
+    <div class="card-ttl">🌾 Configuration Fond Mouvant</div>
+    <div class="fg"><label>Produit vrac</label>
+      <select id="dv-wf-prod" onchange="wfProd('dv')">
+        <option value="300">Plaquettes / biomasse bois</option>
+        <option value="180">Copeaux / sciure</option>
+        <option value="600">Compost</option>
+        <option value="350">Déchets verts</option>
+        <option value="750">Céréales / agricole vrac</option>
+        <option value="1500">Granulats / sable</option>
+        <option value="200">Recyclage (léger)</option>
+        <option value="400">Big bags / divers</option>
+      </select>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>Volume utile (m³)</label><input id="dv-wf-vol" type="number" value="90" step="1" inputmode="decimal" oninput="dvCalc()"></div>
+      <div class="fg"><label>Masse volumique (kg/m³)</label><input id="dv-wf-dens" type="number" value="300" step="10" inputmode="decimal" oninput="dvCalc()"></div>
+    </div>
+    <div class="fg"><label>Charge utile (kg)</label><input id="dv-wf-cu" type="number" value="27000" step="100" inputmode="numeric" oninput="dvCalc()"></div>
+    <div class="sc-list">
+      <label class="sc-item"><input type="checkbox" id="dv-wf-sc-bache" onchange="dvCalc()"> Bâchage / débâchage (+60€)</label>
+      <label class="sc-item"><input type="checkbox" id="dv-wf-sc-net" onchange="dvCalc()"> Nettoyage caisse entre matières (+90€)</label>
+      <label class="sc-item"><input type="checkbox" id="dv-wf-sc-pesee" onchange="dvCalc()"> Pesée / pont bascule (+25€)</label>
+      <label class="sc-item"><input type="checkbox" id="dv-wf-sc-silo" onchange="dvCalc()"> Livraison silo / trémie (+110€)</label>
+    </div>
+    <div class="g2"><div class="fg"><label>Carburant HVO100 €</label><input id="dv-wf-carbu" type="number" value="0" inputmode="decimal" oninput="dvCalc()"></div><div class="fg"><label>Attente après 1h (h)</label><input id="dv-wf-atth" type="number" value="0" step="0.5" min="0" inputmode="decimal" oninput="dvCalc()"></div></div>
+    <div class="fg"><label>Taux horaire €/h</label><input id="dv-wf-attx" type="number" value="55" inputmode="decimal" oninput="dvCalc()"></div>
+  </div>
   <div class="card" id="dv-sc-pe">
     <div class="card-ttl">🏗️ Configuration Plateau GVN</div>
     <div class="fg"><label>Configuration véhicule</label>
@@ -300,7 +361,58 @@ tbody td{padding:10px 12px;vertical-align:middle}
     </div>
     <div class="fg"><label>Échéance paiement</label><input id="fv-ech" value="30 jours fin de mois"></div>
   </div>
-  <div class="card" id="fv-sc-wf" style="display:none"><div class="card-ttl">⛽ Surcharges HVO100 / Attente</div><div class="g2"><div class="fg"><label>Carburant HVO100 €</label><input id="fv-wf-carbu" type="number" value="0" inputmode="decimal"></div><div class="fg"><label>Attente après 1h (h)</label><input id="fv-wf-atth" type="number" value="0" step="0.5" min="0" inputmode="decimal"></div></div><div class="fg"><label>Taux horaire €/h</label><input id="fv-wf-attx" type="number" value="55" inputmode="decimal"></div></div>
+  <div class="card">
+    <div class="card-ttl">📦 Chargement partiel (groupage)</div>
+    <label class="sc-item" style="margin-bottom:10px"><input type="checkbox" id="fv-grp-on" onchange="fvCalc()"><div><div style="font-weight:600">Camion non complet</div><div style="font-size:11px;color:var(--grey)">Facturer la part du camion occupée, pas le trajet complet</div></div></label>
+    <div class="g2">
+      <div class="fg"><label>Type de palette</label><select id="fv-grp-type" onchange="grpType('fv')">
+        <option value="0.4">Europe 80×120 (0,40 ml)</option>
+        <option value="0.5">Industrielle 100×120 (0,50 ml)</option>
+        <option value="0.5">Big bag 100×100 (0,50 ml)</option>
+        <option value="0.6">Demi-palette / autre</option>
+      </select></div>
+      <div class="fg"><label>Nombre de palettes</label><input id="fv-grp-npal" type="number" value="8" min="1" inputmode="numeric" oninput="fvCalc()"></div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>ml plancher / palette</label><input id="fv-grp-pml" type="number" value="0.4" step="0.05" inputmode="decimal" oninput="fvCalc()"></div>
+      <div class="fg"><label>Capacité plancher (ml)</label><input id="fv-grp-cap" type="number" value="13.6" step="0.1" inputmode="decimal" oninput="fvCalc()"></div>
+    </div>
+    <div class="sc-list"><label class="sc-item"><input type="checkbox" id="fv-grp-gerb" onchange="fvCalc()"> Palettes gerbables (×2 en hauteur)</label></div>
+    <div class="sc-list"><label class="sc-item"><input type="checkbox" id="fv-grp-deg" onchange="fvCalc()"><div><div style="font-weight:600">Tarif dégressif au poids</div><div style="font-size:11px;color:var(--grey)">Payant-pour : max(poids réel, ml × équivalence) + barème dégressif</div></div></label></div>
+    <div class="g2">
+      <div class="fg"><label>Poids total du lot (kg)</label><input id="fv-grp-poids" type="number" value="0" inputmode="numeric" oninput="fvCalc()"></div>
+      <div class="fg"><label>Équivalence ml → kg</label><input id="fv-grp-eqv" type="number" value="1750" step="50" inputmode="numeric" oninput="fvCalc()"></div>
+    </div>
+    <div class="fg"><label>Minimum facturé €</label><input id="fv-grp-min" type="number" value="0" inputmode="decimal" oninput="fvCalc()"></div>
+  </div>
+  <div class="card" id="fv-sc-wf" style="display:none">
+    <div class="card-ttl">🌾 Configuration Fond Mouvant</div>
+    <div class="fg"><label>Produit vrac</label>
+      <select id="fv-wf-prod" onchange="wfProd('fv')">
+        <option value="300">Plaquettes / biomasse bois</option>
+        <option value="180">Copeaux / sciure</option>
+        <option value="600">Compost</option>
+        <option value="350">Déchets verts</option>
+        <option value="750">Céréales / agricole vrac</option>
+        <option value="1500">Granulats / sable</option>
+        <option value="200">Recyclage (léger)</option>
+        <option value="400">Big bags / divers</option>
+      </select>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>Volume utile (m³)</label><input id="fv-wf-vol" type="number" value="90" step="1" inputmode="decimal" oninput="fvCalc()"></div>
+      <div class="fg"><label>Masse volumique (kg/m³)</label><input id="fv-wf-dens" type="number" value="300" step="10" inputmode="decimal" oninput="fvCalc()"></div>
+    </div>
+    <div class="fg"><label>Charge utile (kg)</label><input id="fv-wf-cu" type="number" value="27000" step="100" inputmode="numeric" oninput="fvCalc()"></div>
+    <div class="sc-list">
+      <label class="sc-item"><input type="checkbox" id="fv-wf-sc-bache" onchange="fvCalc()"> Bâchage / débâchage (+60€)</label>
+      <label class="sc-item"><input type="checkbox" id="fv-wf-sc-net" onchange="fvCalc()"> Nettoyage caisse entre matières (+90€)</label>
+      <label class="sc-item"><input type="checkbox" id="fv-wf-sc-pesee" onchange="fvCalc()"> Pesée / pont bascule (+25€)</label>
+      <label class="sc-item"><input type="checkbox" id="fv-wf-sc-silo" onchange="fvCalc()"> Livraison silo / trémie (+110€)</label>
+    </div>
+    <div class="g2"><div class="fg"><label>Carburant HVO100 €</label><input id="fv-wf-carbu" type="number" value="0" inputmode="decimal" oninput="fvCalc()"></div><div class="fg"><label>Attente après 1h (h)</label><input id="fv-wf-atth" type="number" value="0" step="0.5" min="0" inputmode="decimal" oninput="fvCalc()"></div></div>
+    <div class="fg"><label>Taux horaire €/h</label><input id="fv-wf-attx" type="number" value="55" inputmode="decimal" oninput="fvCalc()"></div>
+  </div>
   <div class="card" id="fv-sc-pe">
     <div class="card-ttl">🏗️ Configuration Plateau GVN</div>
     <div class="fg"><label>Configuration véhicule</label>
@@ -402,7 +514,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
   </div>
   <div id="ops-maint" style="display:none">
     <div id="maint-alerts"></div>
-    <div class="card"><div class="card-ttl">➕ Ajouter échéance</div><div class="fg"><label>Type d'entretien</label><select id="mt-type"><option>Vidange huile moteur</option><option>Filtre à carburant</option><option>Filtre à air</option><option>Contrôle technique</option><option>Vignette / Taxe</option><option>Pneus tracteur</option><option>Pneus remorque</option><option>Freins</option><option>Tachygraphe</option><option>Révision générale</option><option>Autre</option></select></div><div class="g2"><div class="fg"><label>Dernière date</label><input id="mt-last" type="date"></div><div class="fg"><label>Échéance prochaine</label><input id="mt-next" type="date"></div></div><div class="g2"><div class="fg"><label>Km dernier entretien</label><input id="mt-km" type="number" inputmode="numeric" placeholder="140000"></div><div class="fg"><label>Coût €</label><input id="mt-cout" type="number" inputmode="decimal" placeholder="0"></div></div><div class="fg"><label>Notes</label><input id="mt-notes" placeholder="Garage Schmit, Luxembourg…"></div><button class="btn bn" onclick="mtSave()">💾 Enregistrer</button></div>
+    <div class="card"><div class="card-ttl">➕ Ajouter échéance</div><div class="fg"><label>Type d'échéance</label><select id="mt-type"><optgroup label="🔧 Véhicule — entretien"><option>Vidange huile moteur</option><option>Filtre à carburant</option><option>Filtre à air</option><option>Pneus tracteur</option><option>Pneus remorque</option><option>Freins</option><option>Révision générale</option></optgroup><optgroup label="📋 Véhicule — réglementaire"><option>Contrôle technique</option><option>Tachygraphe (étalonnage)</option><option>Limiteur de vitesse</option><option>Assurance véhicule</option><option>Vignette / Taxe</option><option>Extincteur</option></optgroup><optgroup label="👤 Conducteur"><option>Carte conducteur (tachygraphe)</option><option>FCO / FIMO (CQC)</option><option>Permis CE</option><option>Visite médicale</option><option>Certificat ADR</option></optgroup><optgroup label="🏢 Entreprise"><option>Licence communautaire</option><option>Attestation capacité</option><option>Garantie financière</option></optgroup><option>Autre</option></select></div><div class="g2"><div class="fg"><label>Dernière date</label><input id="mt-last" type="date"></div><div class="fg"><label>Échéance prochaine</label><input id="mt-next" type="date"></div></div><div class="g2"><div class="fg"><label>Km dernier entretien</label><input id="mt-km" type="number" inputmode="numeric" placeholder="140000"></div><div class="fg"><label>Coût €</label><input id="mt-cout" type="number" inputmode="decimal" placeholder="0"></div></div><div class="fg"><label>Notes</label><input id="mt-notes" placeholder="Garage Schmit, Luxembourg…"></div><button class="btn bn" onclick="mtSave()">💾 Enregistrer</button></div>
     <div id="maint-list"></div>
   </div>
 </div>
@@ -410,7 +522,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
 <!-- OUTILS -->
 <div class="page" id="p-tools">
   <div class="pg-title">⚙️ Outils</div>
-  <div class="tab-row"><div class="tab-pill on" id="tools-tab-trm" onclick="toolsTab('trm')">📊 TRM</div><div class="tab-pill" id="tools-tab-grille" onclick="toolsTab('grille')">🗺️ Grille</div><div class="tab-pill" id="tools-tab-carbu" onclick="toolsTab('carbu')">⛽ Carburants</div><div class="tab-pill" id="tools-tab-marche" onclick="toolsTab('marche')">📈 Marché</div></div>
+  <div class="tab-row"><div class="tab-pill on" id="tools-tab-trm" onclick="toolsTab('trm')">📊 TRM</div><div class="tab-pill" id="tools-tab-grille" onclick="toolsTab('grille')">🗺️ Grille</div><div class="tab-pill" id="tools-tab-carbu" onclick="toolsTab('carbu')">⛽ Carburants</div><div class="tab-pill" id="tools-tab-index" onclick="toolsTab('index')">📈 Indexation</div><div class="tab-pill" id="tools-tab-grp" onclick="toolsTab('grp')">📦 Groupage</div><div class="tab-pill" id="tools-tab-marche" onclick="toolsTab('marche')">📊 Marché</div><div class="tab-pill" id="tools-tab-data" onclick="toolsTab('data')">💾 Données</div></div>
   <div id="tools-trm"><div class="card"><div class="card-ttl">📊 TRM — Revient Kilométrique HVO100</div><div class="g2" id="trm-fields"></div><div class="brow" style="margin-top:8px"><button class="btn bn" onclick="trmCalc()">🔢 Calculer</button><button class="btn bg" onclick="trmExport()">📥 Excel</button></div><div class="trm-grid" id="trm-res" style="display:none"></div></div></div>
   <div id="tools-grille" style="display:none"><div class="card"><div class="card-ttl">🗺️ Simulateur tarifaire par pays</div><div class="g2"><div class="fg"><label>Activité</label><select id="gt-act" onchange="gtSim()"><option value="wf">🌾 Walking Floor</option><option value="pe">🏗️ Plateau</option></select></div><div class="fg"><label>Pays</label><select id="gt-pays" onchange="gtSim()"></select></div></div><div class="g2"><div class="fg"><label>Distance km</label><input id="gt-km" type="number" placeholder="350" inputmode="numeric" oninput="gtSim()"></div><div class="fg"><label>Niveau</label><select id="gt-niv" onchange="gtSim()"><option value="moyen">Moyen</option><option value="min">Minimum</option><option value="haut">Haut</option></select></div></div><div class="res-box" id="gt-res"><span style="color:var(--grey);font-size:13px">Sélectionnez un pays et une distance…</span></div><div style="margin-top:12px"><div class="card-ttl" style="border-bottom:2px solid var(--light);padding-bottom:8px;margin-bottom:10px">📈 Corridors — Tarifs de référence marché</div><div id="gt-corridors"></div></div><button class="btn bg" onclick="gtExport()" style="margin-top:8px">📥 Exporter grille complète</button></div></div>
   <div id="tools-carbu" style="display:none">
@@ -420,6 +532,47 @@ tbody td{padding:10px 12px;vertical-align:middle}
     <div id="fuel-history"></div>
   </div>
   <div id="tools-marche" style="display:none"><div class="card"><div class="card-ttl">📈 Analyse tarifaire marché</div><div id="marche-table"></div></div><div class="card"><div class="card-ttl">💡 Recommandations</div><div id="marche-reco"></div></div></div>
+  <div id="tools-index" style="display:none">
+    <div class="card"><div class="card-ttl">⛽ Indexation HVO100 — clause carburant</div>
+      <div class="g2"><div class="fg"><label>Prix HVO100 référence €/L</label><input id="ix-ref" type="number" step="0.001" value="1.350" inputmode="decimal" oninput="indexCalc()"></div><div class="fg"><label>Prix HVO100 actuel €/L</label><input id="ix-now" type="number" step="0.001" value="1.350" inputmode="decimal" oninput="indexCalc()"></div></div>
+      <div class="g2"><div class="fg"><label>Part carburant dans le coût (%)</label><input id="ix-part" type="number" step="0.1" value="30" inputmode="decimal" oninput="indexCalc()"></div><div class="fg"><label>Tarif de base €/km</label><input id="ix-base" type="number" step="0.01" value="1.85" inputmode="decimal" oninput="indexCalc()"></div></div>
+      <div class="res-box" id="ix-res"><span style="color:var(--grey);font-size:13px">Saisissez les paramètres…</span></div>
+      <button class="btn bgo" onclick="indexToDevis()">📄 Appliquer l'ajustement au devis</button>
+      <div style="font-size:11px;color:var(--grey);margin-top:8px;line-height:1.6">Formule type CNR : tarif indexé = base × [1 + part% × (prix actuel − réf)/réf]. Le prix actuel se pré-remplit depuis ton dernier relevé carburant.</div>
+    </div>
+  </div>
+  <div id="tools-grp" style="display:none">
+    <div class="card"><div class="card-ttl">📦 Barème dégressif groupage</div>
+      <div style="font-size:12px;color:var(--grey);line-height:1.6;margin-bottom:10px">Coefficient multiplicateur du prix /100 kg selon le taux de remplissage (poids taxable ÷ camion complet). Plus le coefficient est élevé, plus le petit lot est cher au 100 kg.</div>
+      <div class="g2">
+        <div class="fg"><label>≤ 10 %</label><input id="bar-0" type="number" step="0.05" inputmode="decimal"></div>
+        <div class="fg"><label>≤ 20 %</label><input id="bar-1" type="number" step="0.05" inputmode="decimal"></div>
+        <div class="fg"><label>≤ 35 %</label><input id="bar-2" type="number" step="0.05" inputmode="decimal"></div>
+        <div class="fg"><label>≤ 50 %</label><input id="bar-3" type="number" step="0.05" inputmode="decimal"></div>
+        <div class="fg"><label>≤ 65 %</label><input id="bar-4" type="number" step="0.05" inputmode="decimal"></div>
+        <div class="fg"><label>≤ 80 %</label><input id="bar-5" type="number" step="0.05" inputmode="decimal"></div>
+        <div class="fg"><label>≤ 90 %</label><input id="bar-6" type="number" step="0.05" inputmode="decimal"></div>
+        <div class="fg"><label>Camion plein</label><input id="bar-7" type="number" step="0.05" inputmode="decimal"></div>
+      </div>
+      <div class="fg"><label>Équivalence ml → kg (défaut)</label><input id="bar-eqv" type="number" step="50" inputmode="numeric"></div>
+      <div class="brow"><button class="btn bn" onclick="baremeSave()">💾 Enregistrer</button><button class="btn bgy" onclick="baremeReset()">↺ Défaut</button></div>
+      <div id="bar-preview" style="font-size:12px;color:var(--grey);margin-top:10px;line-height:1.7"></div>
+    </div>
+  </div>
+  <div id="tools-data" style="display:none">
+    <div class="card"><div class="card-ttl">💾 Sauvegarde & restauration</div>
+      <div style="font-size:13px;color:var(--grey);line-height:1.7;margin-bottom:10px">Exporte toutes tes données (CRM, devis, trajets, pleins, échéances, négoce…) dans un fichier. À conserver ou réimporter sur un autre appareil.</div>
+      <div class="brow"><button class="btn bg" onclick="dataExport()">📤 Exporter</button><button class="btn bn" onclick="dataImportClick()">📥 Restaurer</button></div>
+      <input type="file" id="data-file" accept=".json,application/json" style="display:none" onchange="dataImport(event)">
+      <div id="data-info" style="font-size:12px;color:var(--grey);margin-top:8px"></div>
+    </div>
+    <div class="card"><div class="card-ttl">📄 Fiche capacité & conformité</div>
+      <div class="g2"><div class="fg"><label>Immat. tracteur</label><input id="cap-tracteur" placeholder="—" oninput="capSave()"></div><div class="fg"><label>Immat. remorque</label><input id="cap-remorque" placeholder="—" oninput="capSave()"></div></div>
+      <div class="fg"><label>N° licence communautaire</label><input id="cap-licence" placeholder="LU—…" oninput="capSave()"></div>
+      <div style="font-size:12px;color:var(--grey);line-height:1.7;margin-bottom:10px">PDF prêt à envoyer à un donneur d'ordre : specs GVN + HVO100 + état des échéances documentaires saisies dans l'onglet Ops.</div>
+      <button class="btn bgo" onclick="capacitePdf()">📋 Générer la fiche capacité PDF</button>
+    </div>
+  </div>
 </div>
 
 <!-- CHAUFFEUR -->
@@ -484,7 +637,8 @@ tbody td{padding:10px 12px;vertical-align:middle}
 </div><!-- /content -->
 
 <nav id="nav">
-  <div class="nb on"  data-page="devis"   onclick="goPage('devis',this)">  <div class="nb-icon">📄</div><div class="nb-lbl">Devis</div></div>
+  <div class="nb on"  data-page="home"    onclick="goPage('home',this)">   <div class="nb-icon">📊</div><div class="nb-lbl">Accueil</div></div>
+  <div class="nb"     data-page="devis"   onclick="goPage('devis',this)">  <div class="nb-icon">📄</div><div class="nb-lbl">Devis</div></div>
   <div class="nb"     data-page="facture" onclick="goPage('facture',this)"><div class="nb-icon">🧾</div><div class="nb-lbl">Facture</div></div>
   <div class="nb"     data-page="it"      onclick="goPage('it',this)">      <div class="nb-icon">🚛</div><div class="nb-lbl">Trajet</div></div>
   <div class="nb"     data-page="crm"     onclick="goPage('crm',this)">     <div class="nb-icon">👥</div><div class="nb-lbl">CRM</div></div>
@@ -649,6 +803,7 @@ function goPage(page,el){
   for(i=0;i<nbs.length;i++) nbs[i].classList.remove('on');
   if(el) el.classList.add('on');
   var c=$('content'); if(c) c.scrollTop=0;
+  if(page==='home') renderHome();
   if(page==='crm') crmRender();
   if(page==='pipe') pipeRender();
   if(page==='ops') opsRenderAll();
@@ -743,13 +898,80 @@ function alignerMarche(p){ setNiveau(p,'moyen'); sv(p+'-ajust',0); qTf(p); showT
 function dvAlignerMarche(){ alignerMarche('dv'); }
 function fvAlignerMarche(){ alignerMarche('fv'); }
 
+function wfProd(p){
+  var sel=$(p+'-wf-prod'); if(sel) sv(p+'-wf-dens',sel.value);
+  if(p==='dv') dvCalc(); else fvCalc();
+}
+var BAREME_THRESH=[0.10,0.20,0.35,0.50,0.65,0.80,0.90,1.01];
+var DEFAULT_BAREME=[2.00,1.70,1.45,1.30,1.18,1.10,1.05,1.00];
+var grpBareme=load('grpBareme',DEFAULT_BAREME.slice());
+var grpEqvDef=load('grpEqvDef',1750);
+function grpDegFactor(s){
+  var i; for(i=0;i<BAREME_THRESH.length;i++){ if(s<=BAREME_THRESH[i]) return (+grpBareme[i]||DEFAULT_BAREME[i]); }
+  return (+grpBareme[grpBareme.length-1]||1.00);
+}
+function baremeRender(){
+  var i; for(i=0;i<8;i++){ if($('bar-'+i)) sv('bar-'+i,(+grpBareme[i]||DEFAULT_BAREME[i])); }
+  if($('bar-eqv')) sv('bar-eqv',grpEqvDef);
+  baremePreview();
+}
+function baremePreview(){
+  var lbls=['≤10%','≤20%','≤35%','≤50%','≤65%','≤80%','≤90%','plein'];
+  var s='Aperçu (sur un complet à 660 € / 23 800 kg) : ',i;
+  var base100=660/(23800/100);
+  var parts=[]; for(i=0;i<8;i++){ parts.push(lbls[i]+' '+(base100*(+grpBareme[i]||DEFAULT_BAREME[i])).toFixed(2)+'€'); }
+  st('bar-preview',s+parts.join(' · ')+' /100kg');
+}
+function baremeSave(){
+  var i,arr=[]; for(i=0;i<8;i++){ var v=parseFloat(gv('bar-'+i)); arr.push(isNaN(v)?DEFAULT_BAREME[i]:v); }
+  grpBareme=arr; save('grpBareme',grpBareme);
+  var e=parseFloat(gv('bar-eqv')); grpEqvDef=isNaN(e)?1750:e; save('grpEqvDef',grpEqvDef);
+  baremePreview(); showToast('Barème enregistré','ok');
+}
+function baremeReset(){
+  grpBareme=DEFAULT_BAREME.slice(); save('grpBareme',grpBareme);
+  grpEqvDef=1750; save('grpEqvDef',grpEqvDef);
+  baremeRender(); showToast('Barème par défaut rétabli');
+}
+function grpType(p){
+  var sel=$(p+'-grp-type'); if(sel) sv(p+'-grp-pml',sel.value);
+  if(p==='dv') dvCalc(); else fvCalc();
+}
 function qEngine(p){
   var a=qAct[p];
   var km=gn(p+'-km');
   var rate=qSelectedRate(p);
-  var transport=rate*km;
+  var fullTransport=rate*km;
+  var transport=fullTransport;
   var lignes=[];
-  lignes.push({l:'Transport ('+num(km,0)+' km × '+num(rate,2)+' €/km)',v:transport});
+  var grp=null;
+  if(gc(p+'-grp-on')){
+    var gpml=gn(p+'-grp-pml')||0.4, gnpal=gn(p+'-grp-npal')||0, ggerb=gc(p+'-grp-gerb');
+    var gcap=gn(p+'-grp-cap')||13.6, gfloor=gn(p+'-grp-min');
+    var gml=gnpal*gpml*(ggerb?0.5:1);
+    if(gc(p+'-grp-deg')){
+      var gpoids=gn(p+'-grp-poids'), geqv=gn(p+'-grp-eqv')||1750;
+      var taxable=Math.max(gpoids,gml*geqv);
+      var fullTax=gcap*geqv;
+      var shareTax=fullTax>0?Math.min(1,taxable/fullTax):1;
+      var factor=grpDegFactor(shareTax);
+      var base100=fullTax>0?(fullTransport/(fullTax/100)):0;
+      var propD=(taxable/100)*base100*factor;
+      transport=Math.max(propD,gfloor);
+      grp={mode:'deg',npal:gnpal,ml:gml,cap:gcap,share:(gcap>0?Math.min(1,gml/gcap):1),
+        taxable:taxable,poids:gpoids,eqv:geqv,shareTax:shareTax,factor:factor,base100:base100,
+        eur100:taxable>0?(transport/(taxable/100)):0,full:fullTransport,floored:(gfloor>0&&propD<gfloor)};
+      lignes.push({l:'Groupage dégressif — '+gnpal+' pal. / '+num(taxable,0)+' kg taxables ('+num(shareTax*100,0)+'%)',v:transport});
+    } else {
+      var gshare=gcap>0?Math.min(1,gml/gcap):1;
+      var propP=fullTransport*gshare;
+      transport=Math.max(propP,gfloor);
+      grp={mode:'prorata',npal:gnpal,pml:gpml,gerb:ggerb,ml:gml,cap:gcap,share:gshare,full:fullTransport,floored:(gfloor>0&&propP<gfloor)};
+      lignes.push({l:'Transport groupage — '+gnpal+' pal. ('+num(gshare*100,0)+'% du complet'+(grp.floored?', minimum':'')+')',v:transport});
+    }
+  } else {
+    lignes.push({l:'Transport ('+num(km,0)+' km × '+num(rate,2)+' €/km)',v:transport});
+  }
 
   var surcharges=0, carbu=0, peage=0, attente=0;
   if(a==='pe'){
@@ -764,6 +986,10 @@ function qEngine(p){
     if(peage){ lignes.push({l:'Péage additionnel',v:peage}); }
     if(attente){ lignes.push({l:'Attente ('+num(ah,2)+'h × '+num(ax,0)+'€)',v:attente}); }
   } else {
+    if(gc(p+'-wf-sc-bache')){ surcharges+=60; lignes.push({l:'Bâchage / débâchage',v:60}); }
+    if(gc(p+'-wf-sc-net')){ surcharges+=90; lignes.push({l:'Nettoyage caisse',v:90}); }
+    if(gc(p+'-wf-sc-pesee')){ surcharges+=25; lignes.push({l:'Pesée / pont bascule',v:25}); }
+    if(gc(p+'-wf-sc-silo')){ surcharges+=110; lignes.push({l:'Livraison silo / trémie',v:110}); }
     carbu=gn(p+'-wf-carbu');
     var wah=gn(p+'-wf-atth'), wax=gn(p+'-wf-attx');
     attente=wah*wax;
@@ -783,8 +1009,24 @@ function qEngine(p){
   var dev=(p==='dv')?(gv('dv-dev')||'EUR'):'EUR';
   var fx=DEVISES[dev]||1;
 
+  var wfCap=null;
+  if(a==='wf'){
+    var vol=gn(p+'-wf-vol'), dens=gn(p+'-wf-dens'), cu=gn(p+'-wf-cu');
+    var volMass=vol*dens;
+    if(volMass>0||cu>0){
+      var loadKg=(cu>0)?Math.min(volMass,cu):volMass;
+      var tonnage=loadKg/1000;
+      var lim=(cu>0&&volMass>cu)?'Poids':'Volume';
+      var util=(cu>0)?(loadKg/cu*100):0;
+      var eurT=tonnage>0?(ht/tonnage):0;
+      wfCap={vol:vol,dens:dens,cu:cu,tonnage:tonnage,lim:lim,util:util,eurT:eurT};
+    }
+  }
+
+  if(grp){ grp.eurPal=grp.npal>0?(ht/grp.npal):0; }
+
   return {prefix:p,act:a,km:km,rate:rate,lignes:lignes,ht:ht,tauxTva:tauxTva,tva:tva,ttc:ttc,
-    b2b:b2b,co2:co2,dev:dev,fx:fx,pays:pays,fil:gv(p+'-fil'),
+    b2b:b2b,co2:co2,dev:dev,fx:fx,pays:pays,fil:gv(p+'-fil'),wf:wfCap,grp:grp,
     client:gv(p+'-client'),contact:gv(p+'-contact'),dep:gv(p+'-dep'),arr:gv(p+'-arr')};
 }
 
@@ -809,6 +1051,30 @@ function qRender(p){
   h+='<div class="rsep"></div>';
   h+='<div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--gold)">TOTAL '+(q.b2b?'HT':'TTC')+'</span><span class="rg">'+money((q.b2b?q.ht:q.ttc)*fx)+' '+dev+'</span></div>';
   if(q.co2>0){ h+='<div style="font-size:11px;color:#27AE60;margin-top:6px">🌿 ≈ '+num(q.co2,0)+' kg CO₂ évités vs gazole (HVO100)</div>'; }
+  if(q.act==='wf'&&q.wf&&q.wf.tonnage>0){
+    h+='<div class="rsep"></div>';
+    h+='<div style="display:flex;justify-content:space-between"><span>Tonnage chargé</span><span class="rv">'+num(q.wf.tonnage,1)+' t</span></div>';
+    h+='<div style="display:flex;justify-content:space-between"><span>Facteur limitant</span><span class="rv">'+esc(q.wf.lim)+'</span></div>';
+    h+='<div style="display:flex;justify-content:space-between"><span>Taux charge utile</span><span class="rv">'+num(q.wf.util,0)+'%</span></div>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--gold)">Prix au tonnage</span><span class="rg">'+money(q.wf.eurT*fx)+' '+dev+'/t</span></div>';
+    if(q.wf.lim==='Volume'&&q.wf.util<85){ h+='<div style="font-size:11px;color:var(--orange);margin-top:4px">⚠️ Produit léger : limité par le volume — '+num(q.wf.util,0)+'% de la charge utile seulement.</div>'; }
+  }
+  if(q.grp){
+    h+='<div class="rsep"></div>';
+    if(q.grp.mode==='deg'){
+      var b1=q.grp.base100*grpDegFactor(0.10), b2=q.grp.base100*grpDegFactor(1);
+      h+='<div style="display:flex;justify-content:space-between"><span>Poids taxable (payant-pour)</span><span class="rv">'+num(q.grp.taxable,0)+' kg</span></div>';
+      h+='<div style="display:flex;justify-content:space-between"><span>Tranche '+num(q.grp.shareTax*100,0)+'%</span><span class="rv">× '+num(q.grp.factor,2)+'</span></div>';
+      h+='<div style="display:flex;justify-content:space-between"><span>Prix / 100 kg</span><span class="rv">'+money(q.grp.eur100*fx)+' '+dev+'</span></div>';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--gold)">Prix / palette (tout compris)</span><span class="rg">'+money(q.grp.eurPal*fx)+' '+dev+'</span></div>';
+      h+='<div style="font-size:11px;color:var(--grey);margin-top:4px">Barème dégressif : petit lot ≈ '+money(b1*fx)+' → camion plein ≈ '+money(b2*fx)+' '+dev+'/100 kg.'+(q.grp.poids>0&&q.grp.taxable>q.grp.poids?' Facturé au volume (ml × équivalence) plutôt qu\'au poids réel.':'')+'</div>';
+    } else {
+      h+='<div style="display:flex;justify-content:space-between"><span>Remplissage</span><span class="rv">'+num(q.grp.ml,2)+' / '+num(q.grp.cap,2)+' ml ('+num(q.grp.share*100,0)+'%)</span></div>';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--gold)">Prix / palette (tout compris)</span><span class="rg">'+money(q.grp.eurPal*fx)+' '+dev+'</span></div>';
+      if(q.grp.share>=1){ h+='<div style="font-size:11px;color:var(--orange);margin-top:4px">ℹ️ Camion plein à ce stade — le groupage n\'apporte rien, tu peux le désactiver.</div>'; }
+      else { h+='<div style="font-size:11px;color:var(--grey);margin-top:4px">Reste '+num((q.grp.cap-q.grp.ml),2)+' ml libres pour grouper d\'autres clients.</div>'; }
+    }
+  }
   st(p+'-res',h);
 }
 function dvCalc(){ qRender('dv'); }
@@ -873,6 +1139,27 @@ function qExport(p,type){
   rows.push([q.b2b?'TVA':'TVA '+(q.tauxTva*100).toFixed(1)+'%', q.b2b?'Autoliquidation':Math.round(q.tva*100)/100]);
   rows.push(['Total '+(q.b2b?'HT':'TTC'),Math.round((q.b2b?q.ht:q.ttc)*100)/100]);
   rows.push(['CO2 évité (kg)',Math.round(q.co2)]);
+  if(q.act==='wf'&&q.wf&&q.wf.tonnage>0){
+    rows.push(['','']);
+    rows.push(['Tonnage chargé (t)',Math.round(q.wf.tonnage*10)/10]);
+    rows.push(['Facteur limitant',q.wf.lim]);
+    rows.push(['Taux charge utile (%)',Math.round(q.wf.util)]);
+    rows.push(['Prix au tonnage €/t',Math.round(q.wf.eurT*100)/100]);
+  }
+  if(q.grp){
+    rows.push(['','']);
+    rows.push(['Groupage palettes',q.grp.npal]);
+    rows.push(['Remplissage (ml)',Math.round(q.grp.ml*100)/100+' / '+q.grp.cap]);
+    if(q.grp.mode==='deg'){
+      rows.push(['Poids taxable (kg)',Math.round(q.grp.taxable)]);
+      rows.push(['Tranche dégressive (%)',Math.round(q.grp.shareTax*100)]);
+      rows.push(['Coefficient',q.grp.factor]);
+      rows.push(['Prix / 100 kg €',Math.round(q.grp.eur100*100)/100]);
+    } else {
+      rows.push(['Taux remplissage (%)',Math.round(q.grp.share*100)]);
+    }
+    rows.push(['Prix / palette €',Math.round(q.grp.eurPal*100)/100]);
+  }
   xlsxDownload(rows,type+'_BlackDog',type);
 }
 function dvExport(){ qExport('dv','Devis'); }
@@ -1106,18 +1393,22 @@ function cpSave(){
 }
 function opDelPlein(id){ pleins=pleins.filter(function(p){ return p.id!==id; }); save('pleins',pleins); opsRenderPleins(); }
 
+function echIcon(t){ t=(t||'').toLowerCase();
+  if(t.indexOf('conducteur')>=0||t.indexOf('fco')>=0||t.indexOf('fimo')>=0||t.indexOf('permis')>=0||t.indexOf('médic')>=0||t.indexOf('medic')>=0||t.indexOf('adr')>=0) return '👤';
+  if(t.indexOf('licence')>=0||t.indexOf('capacit')>=0||t.indexOf('garantie')>=0) return '🏢';
+  if(t.indexOf('contrôle')>=0||t.indexOf('controle')>=0||t.indexOf('tacho')>=0||t.indexOf('limiteur')>=0||t.indexOf('assurance')>=0||t.indexOf('vignette')>=0||t.indexOf('taxe')>=0||t.indexOf('extincteur')>=0) return '📋';
+  return '🔧'; }
 function opsRenderMaint(){
   var now=new Date(); var alerts='',list='',i;
   var sorted=maintenance.slice().sort(function(a,b){ return (a.next||'').localeCompare(b.next||''); });
   for(i=0;i<sorted.length;i++){ var m=sorted[i];
     var diff=m.next?Math.round((new Date(m.next+'T00:00:00')-now)/86400000):null;
-    if(diff!=null&&diff<=30){
-      var cls=diff<0?'maint-alert':'maint-alert';
-      alerts+='<div class="'+cls+'">⚠️ <div><strong>'+esc(m.type)+'</strong> — '+(diff<0?('en retard de '+(-diff)+' j'):('échéance dans '+diff+' j'))+' ('+frDate(m.next)+')</div></div>';
+    if(diff!=null&&diff<=60){
+      alerts+='<div class="maint-alert">'+echIcon(m.type)+' <div><strong>'+esc(m.type)+'</strong> — '+(diff<0?('en retard de '+(-diff)+' j'):('échéance dans '+diff+' j'))+' ('+frDate(m.next)+')</div></div>';
     }
-    list+='<div class="op-item"><div class="op-icon">🔧</div><div class="op-body"><div class="op-ttl">'+esc(m.type)+'</div><div class="op-sub">Prochaine : '+frDate(m.next)+(m.km?(' · '+num(+m.km,0)+' km'):'')+(m.notes?(' · '+esc(m.notes)):'')+'</div></div><div class="op-val">'+(m.cout?money(+m.cout)+'€':'')+'<br><button class="btn br btn-sm" style="margin-top:4px" onclick="opDelMaint('+m.id+')">🗑</button></div></div>';
+    list+='<div class="op-item"><div class="op-icon">'+echIcon(m.type)+'</div><div class="op-body"><div class="op-ttl">'+esc(m.type)+'</div><div class="op-sub">Prochaine : '+frDate(m.next)+(m.km?(' · '+num(+m.km,0)+' km'):'')+(m.notes?(' · '+esc(m.notes)):'')+'</div></div><div class="op-val">'+(m.cout?money(+m.cout)+'€':'')+'<br><button class="btn br btn-sm" style="margin-top:4px" onclick="opDelMaint('+m.id+')">🗑</button></div></div>';
   }
-  if(!alerts) alerts='<div class="maint-alert maint-ok">✅ <div>Aucune échéance dans les 30 jours.</div></div>';
+  if(!alerts) alerts='<div class="maint-alert maint-ok">✅ <div>Aucune échéance dans les 60 jours.</div></div>';
   st('maint-alerts',alerts); st('maint-list',list);
 }
 function mtSave(){
@@ -1133,7 +1424,7 @@ function opDelMaint(id){ maintenance=maintenance.filter(function(m){ return m.id
    OUTILS
 ============================================================ */
 function toolsTab(t){
-  var tabs=['trm','grille','carbu','marche'],i;
+  var tabs=['trm','grille','carbu','index','grp','marche','data'],i;
   for(i=0;i<tabs.length;i++){
     var pill=$('tools-tab-'+tabs[i]); if(pill) pill.className='tab-pill'+(tabs[i]===t?' on':'');
     var pane=$('tools-'+tabs[i]); if(pane) pane.style.display=(tabs[i]===t?'block':'none');
@@ -1141,6 +1432,9 @@ function toolsTab(t){
   if(t==='carbu') fuelRender();
   if(t==='marche') marcheRender();
   if(t==='grille') gtSim();
+  if(t==='index') indexInit();
+  if(t==='grp') baremeRender();
+  if(t==='data') dataInit();
 }
 /* TRM */
 function trmBuildFields(){
@@ -1150,22 +1444,25 @@ function trmBuildFields(){
   }
   st('trm-fields',h);
 }
-function trmCalc(){
-  var kmAn=gn('trm-km_an'); if(kmAn<=0){ showToast('Km/an requis','err'); return; }
+function trmCompute(){
+  var kmAn=gn('trm-km_an')||120000;
   var carbuAn=(gn('trm-carbu_l100')/100)*kmAn*gn('trm-carbu_prix');
   var fixes=gn('trm-pneus')+gn('trm-entretien')+gn('trm-assurance')+gn('trm-taxes')+gn('trm-leasing')+gn('trm-salaire')+gn('trm-frais');
-  var totAn=carbuAn+fixes;
-  var crk=totAn/kmAn;
-  var crkCarbu=carbuAn/kmAn;
-  var crkFixe=fixes/kmAn;
+  var crk=kmAn>0?(carbuAn+fixes)/kmAn:0;
+  var part=(carbuAn+fixes)>0?(carbuAn/(carbuAn+fixes)*100):30;
+  return {kmAn:kmAn,carbuAn:carbuAn,fixes:fixes,crk:crk,part:part};
+}
+function trmCalc(){
+  var kmAn=gn('trm-km_an'); if(kmAn<=0){ showToast('Km/an requis','err'); return; }
+  var r=trmCompute();
   st('trm-res',
-    '<div class="trm-item"><div class="trm-l">Carburant/an</div><div class="trm-v">'+num(carbuAn,0)+' €</div></div>'+
-    '<div class="trm-item"><div class="trm-l">Charges fixes/an</div><div class="trm-v">'+num(fixes,0)+' €</div></div>'+
-    '<div class="trm-item"><div class="trm-l">CRK carburant</div><div class="trm-v">'+num(crkCarbu,3)+' €/km</div></div>'+
-    '<div class="trm-item"><div class="trm-l">CRK fixes</div><div class="trm-v">'+num(crkFixe,3)+' €/km</div></div>'+
-    '<div class="trm-item hi"><div class="trm-l">COÛT DE REVIENT KILOMÉTRIQUE</div><div class="trm-v">'+num(crk,3)+' €/km</div></div>'+
-    '<div class="trm-item"><div class="trm-l">Seuil rentab. (1.85 €/km)</div><div class="trm-v">'+num((1.85-crk),3)+' €/km</div></div>'+
-    '<div class="trm-item"><div class="trm-l">Marge/an @1.85</div><div class="trm-v">'+num((1.85-crk)*kmAn,0)+' €</div></div>');
+    '<div class="trm-item"><div class="trm-l">Carburant/an</div><div class="trm-v">'+num(r.carbuAn,0)+' €</div></div>'+
+    '<div class="trm-item"><div class="trm-l">Charges fixes/an</div><div class="trm-v">'+num(r.fixes,0)+' €</div></div>'+
+    '<div class="trm-item"><div class="trm-l">CRK carburant</div><div class="trm-v">'+num(r.carbuAn/r.kmAn,3)+' €/km</div></div>'+
+    '<div class="trm-item"><div class="trm-l">CRK fixes</div><div class="trm-v">'+num(r.fixes/r.kmAn,3)+' €/km</div></div>'+
+    '<div class="trm-item hi"><div class="trm-l">COÛT DE REVIENT KILOMÉTRIQUE</div><div class="trm-v">'+num(r.crk,3)+' €/km</div></div>'+
+    '<div class="trm-item"><div class="trm-l">Prix plancher conseillé (+10%)</div><div class="trm-v">'+num(r.crk*1.10,3)+' €/km</div></div>'+
+    '<div class="trm-item"><div class="trm-l">Marge/an @1.85</div><div class="trm-v">'+num((1.85-r.crk)*r.kmAn,0)+' €</div></div>');
   $('trm-res').style.display='grid';
 }
 function trmExport(){
@@ -1764,6 +2061,145 @@ function fillPaysSelect(id){
   var html='',i; for(i=0;i<PAYS_LIST.length;i++){ var c=PAYS_LIST[i]; html+='<option value="'+c+'">'+c+' — '+esc(GRILLE[c].nom)+'</option>'; }
   st(id,html);
 }
+/* ============================================================
+   TABLEAU DE BORD (Accueil)
+============================================================ */
+function renderHome(){
+  var km=0,ca=0,lit=0,i;
+  for(i=0;i<trajets.length;i++){ km+=(+trajets[i].km||0); ca+=(+trajets[i].ca||0); lit+=(+trajets[i].litres||0); }
+  var mois=todayISO().slice(0,7), caMois=0;
+  for(i=0;i<trajets.length;i++){ if((trajets[i].date||'').slice(0,7)===mois) caMois+=(+trajets[i].ca||0); }
+  var trm=trmCompute();
+  var now=new Date(), ech=[];
+  for(i=0;i<maintenance.length;i++){ var m=maintenance[i]; if(!m.next) continue;
+    var diff=Math.round((new Date(m.next+'T00:00:00')-now)/86400000); if(diff<=60) ech.push({m:m,diff:diff}); }
+  ech.sort(function(a,b){ return a.diff-b.diff; });
+  var pond=0; for(i=0;i<pipeline.length;i++) pond+=(+pipeline[i].ht||0)*(PROB[pipeline[i].stat]||0)/100;
+  var clients=0; for(i=0;i<prospects.length;i++){ if(prospects[i].statut==='Client') clients++; }
+  var fHvo=fuelPrices.length?(+fuelPrices[fuelPrices.length-1].hvo||0):0;
+
+  st('home-kpis',
+    '<div class="kpi"><div class="kpi-v">'+num(caMois/1000,1)+'k</div><div class="kpi-l">CA mois €</div></div>'+
+    '<div class="kpi"><div class="kpi-v">'+num(trm.crk,3)+'</div><div class="kpi-l">CRK €/km</div></div>'+
+    '<div class="kpi"><div class="kpi-v">'+num(trm.crk*1.10,2)+'</div><div class="kpi-l">Plancher €/km</div></div>'+
+    '<div class="kpi"><div class="kpi-v">'+ech.length+'</div><div class="kpi-l">Échéances 60j</div></div>');
+
+  if(!ech.length){ st('home-echeances','<div style="font-size:13px;color:var(--green)">✅ Aucune échéance dans les 60 jours.</div>'); }
+  else { var h='',j; for(j=0;j<ech.length&&j<8;j++){ var e=ech[j];
+      h+='<div class="op-item" style="padding:10px 12px"><div class="op-icon">'+echIcon(e.m.type)+'</div><div class="op-body"><div class="op-ttl" style="font-size:13px">'+esc(e.m.type)+'</div><div class="op-sub">'+(e.diff<0?('⚠️ en retard de '+(-e.diff)+' j'):('dans '+e.diff+' j'))+' · '+frDate(e.m.next)+'</div></div></div>'; }
+    st('home-echeances',h); }
+
+  st('home-activite','<div style="display:flex;gap:8px;flex-wrap:wrap"><span class="pr-stat">🚚 '+trajets.length+' trajets</span><span class="pr-stat">📏 '+num(km,0)+' km</span><span class="pr-stat">💶 '+num(ca,0)+' € HT cumul</span><span class="pr-stat">⛽ '+(km>0?num(lit/km*100,1):'—')+' L/100</span></div>');
+  st('home-commercial','<div style="display:flex;gap:8px;flex-wrap:wrap"><span class="pr-stat">👥 '+prospects.length+' prospects</span><span class="pr-stat">🤝 '+clients+' clients</span><span class="pr-stat">📊 '+num(pond/1000,1)+'k € pondéré</span></div>');
+  st('home-marge','<div style="font-size:13px;line-height:1.9">Dernier HVO100 : <strong>'+(fHvo?num(fHvo,3)+' €/L':'—')+'</strong><br>Tarif réf. marché 1,85 €/km → marge <strong style="color:var(--gold)">'+num(1.85-trm.crk,3)+' €/km</strong> ('+num(trm.crk>0?(1.85-trm.crk)/trm.crk*100:0,0)+'%)<br>Part carburant dans le coût : '+num(trm.part,0)+'%</div>');
+}
+
+/* ============================================================
+   SAUVEGARDE / RESTAURATION
+============================================================ */
+function dataKeys(){ var keys=[],i; try{ for(i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(k&&k.indexOf('bd_')===0) keys.push(k); } }catch(e){} return keys; }
+function dataInit(){ dataRenderInfo(); }
+function dataRenderInfo(){ var keys=dataKeys(); st('data-info','Données en mémoire : '+keys.length+' jeux ('+keys.map(function(k){return k.replace('bd_','');}).join(', ')+').'); }
+function dataExport(){
+  try{
+    var keys=dataKeys(), obj={__app:'BlackDog',__date:todayISO(),data:{}},i;
+    for(i=0;i<keys.length;i++){ obj.data[keys[i]]=localStorage.getItem(keys[i]); }
+    var blob=new Blob([JSON.stringify(obj)],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.href=url; a.download='BlackDog_sauvegarde_'+todayISO()+'.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); },1000);
+    showToast('Sauvegarde exportée','ok');
+  }catch(e){ showToast('Export impossible','err'); }
+}
+function dataImportClick(){ var f=$('data-file'); if(f) f.click(); }
+function dataImport(ev){
+  var file=ev&&ev.target&&ev.target.files?ev.target.files[0]:null; if(!file){ return; }
+  if(!confirm('Restaurer cette sauvegarde ? Les données actuelles seront remplacées.')){ ev.target.value=''; return; }
+  var rd=new FileReader();
+  rd.onload=function(){
+    try{
+      var obj=JSON.parse(rd.result);
+      var d=(obj&&obj.data)?obj.data:obj; var k;
+      for(k in d){ if(k.indexOf('bd_')===0) localStorage.setItem(k,d[k]); }
+      prospects=load('prospects',[]); pipeline=load('pipeline',[]); trajets=load('trajets',[]);
+      pleins=load('pleins',[]); maintenance=load('maintenance',[]); fuelPrices=load('fuelPrices',[]);
+      drvTemps=load('drvTemps',[]); drvFrais=load('drvFrais',[]); negHist=load('negHist',[]);
+      capLoad(); renderHome(); dataRenderInfo();
+      showToast('Sauvegarde restaurée','ok');
+    }catch(e){ showToast('Fichier invalide','err'); }
+    ev.target.value='';
+  };
+  rd.readAsText(file);
+}
+
+/* ============================================================
+   FICHE CAPACITÉ & CONFORMITÉ
+============================================================ */
+function capLoad(){ var c=load('capacite',{}); if($('cap-tracteur')) sv('cap-tracteur',c.tracteur||''); if($('cap-remorque')) sv('cap-remorque',c.remorque||''); if($('cap-licence')) sv('cap-licence',c.licence||''); }
+function capSave(){ save('capacite',{tracteur:gv('cap-tracteur'),remorque:gv('cap-remorque'),licence:gv('cap-licence')}); }
+function capacitePdf(){
+  var c=load('capacite',{}); var now=new Date(); var docs='',i,any=false;
+  var sorted=maintenance.slice().sort(function(a,b){ return (a.next||'').localeCompare(b.next||''); });
+  for(i=0;i<sorted.length;i++){ var m=sorted[i]; if(!m.next) continue; any=true;
+    var diff=Math.round((new Date(m.next+'T00:00:00')-now)/86400000);
+    var stt=diff<0?'<span style="color:#E74C3C">Expiré</span>':(diff<=60?'<span style="color:#E67E22">'+diff+' j</span>':'<span style="color:#2ECC71">Valide</span>');
+    docs+='<tr><td>'+esc(m.type)+'</td><td>'+frDate(m.next)+'</td><td style="text-align:right">'+stt+'</td></tr>';
+  }
+  if(!any) docs='<tr><td colspan="3" style="color:#7A8FAD">Aucune échéance saisie (onglet Ops → Entretien).</td></tr>';
+  var html=''+
+  '<div class="pdf-hdr"><div><div class="pdf-logo">🐾 BLACKDOG TRUCKING</div><div class="pdf-sub">Sàrl-S · Luxembourg · Transport international GVN · HVO100</div></div><div class="pdf-type">CAPACITÉ</div></div>'+
+  '<div class="pdf-meta">'+
+    '<div><div class="pdf-meta-lbl">Date</div><div class="pdf-meta-val">'+frDate(todayISO())+'</div></div>'+
+    '<div><div class="pdf-meta-lbl">Licence comm.</div><div class="pdf-meta-val">'+esc(c.licence||'—')+'</div></div>'+
+    '<div><div class="pdf-meta-lbl">Tracteur</div><div class="pdf-meta-val">'+esc(c.tracteur||'—')+'</div></div>'+
+    '<div><div class="pdf-meta-lbl">Remorque</div><div class="pdf-meta-val">'+esc(c.remorque||'—')+'</div></div>'+
+  '</div>'+
+  '<table class="pdf-table"><thead><tr><th>Capacité technique</th><th></th></tr></thead><tbody>'+
+    '<tr><td>Tracteur</td><td>MAN TGX 18.510 Low-Deck · Euro 6 · HVO100</td></tr>'+
+    '<tr><td>Remorque</td><td>Plateau GVN porte-engins / porte-conteneurs</td></tr>'+
+    '<tr><td>Longueur utile</td><td>13,60 m · largeur 2,50 m</td></tr>'+
+    '<tr><td>Charge utile</td><td>&asymp; 26 t</td></tr>'+
+    '<tr><td>Configuration</td><td>Sellette surbaissée (col de cygne 98 cm) · ranchers + rampes</td></tr>'+
+    '<tr><td>Carburant</td><td>HVO100 (EN 15940) &mdash; &minus;90% CO&#8322; vs gazole fossile</td></tr>'+
+    '<tr><td>Couverture</td><td>Scandinavie &harr; Péninsule ibérique / Italie (axe Nord-Sud)</td></tr>'+
+  '</tbody></table>'+
+  '<table class="pdf-table" style="margin-top:14px"><thead><tr><th>Échéance documentaire</th><th>Prochaine</th><th style="text-align:right">État</th></tr></thead><tbody>'+docs+'</tbody></table>'+
+  '<div class="pdf-footer">BlackDog Trucking Sàrl-S · Luxembourg · Document de capacité fourni à titre informatif aux donneurs d\'ordre. Justificatifs originaux disponibles sur demande.</div>';
+  st('pdf-doc',html); $('pdf-preview').style.display='block';
+}
+
+/* ============================================================
+   INDEXATION HVO100 (clause carburant)
+============================================================ */
+function indexInit(){
+  if(fuelPrices.length){ var last=fuelPrices[fuelPrices.length-1]; if(last&&last.hvo&&$('ix-now')) sv('ix-now',(+last.hvo).toFixed(3)); }
+  var trm=trmCompute(); if($('ix-part')) sv('ix-part',(Math.round(trm.part*10)/10));
+  indexCalc();
+}
+function indexCalc(){
+  var ref=gn('ix-ref'), now=gn('ix-now'), part=gn('ix-part'), base=gn('ix-base');
+  if(ref<=0||base<=0){ st('ix-res','<span style="color:var(--grey);font-size:13px">Saisissez les paramètres…</span>'); return; }
+  var coef=1+(part/100)*((now-ref)/ref);
+  var indexed=base*coef, delta=indexed-base;
+  indexCalc._delta=delta;
+  var cls=delta>=0?'var(--gold)':'#2ECC71';
+  st('ix-res',
+    '<div style="display:flex;justify-content:space-between"><span>Variation HVO100</span><span class="rv">'+num((now-ref),3)+' €/L ('+num(ref>0?(now-ref)/ref*100:0,1)+'%)</span></div>'+
+    '<div style="display:flex;justify-content:space-between"><span>Coefficient indexation</span><span class="rv">'+num(coef,4)+'</span></div>'+
+    '<div class="rsep"></div>'+
+    '<div style="display:flex;justify-content:space-between"><span>Tarif de base</span><span class="rv">'+num(base,3)+' €/km</span></div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--gold)">Tarif indexé</span><span class="rg">'+num(indexed,3)+' €/km</span></div>'+
+    '<div style="font-size:12px;color:'+cls+';margin-top:4px">Ajustement : '+(delta>=0?'+':'')+num(delta,3)+' €/km</div>');
+}
+function indexToDevis(){
+  if(indexCalc._delta==null){ indexCalc(); }
+  var d=indexCalc._delta||0;
+  goPage('devis',document.querySelector('.nb[data-page="devis"]'));
+  sv('dv-ajust',(Math.round(d*100)/100)); qTf('dv'); qRender('dv');
+  showToast('Ajustement indexation appliqué au devis','ok');
+}
+
 function init(){
   // date entête
   try{ st('hdate',new Date().toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})); }catch(e){ st('hdate',todayISO()); }
@@ -1791,6 +2227,14 @@ function init(){
   crmKpis();
   // grille corridors
   gtRenderCorridors('wf');
+  // capacité + tableau de bord
+  capLoad();
+  // barème groupage : équivalence par défaut dans les cartes
+  if($('dv-grp-eqv')&&!gv('dv-grp-eqv')) sv('dv-grp-eqv',grpEqvDef);
+  if($('fv-grp-eqv')&&!gv('fv-grp-eqv')) sv('fv-grp-eqv',grpEqvDef);
+  sv('dv-grp-eqv',grpEqvDef); sv('fv-grp-eqv',grpEqvDef);
+  baremeRender();
+  renderHome();
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
 else init();
