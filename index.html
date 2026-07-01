@@ -188,6 +188,18 @@ tbody td{padding:10px 12px;vertical-align:middle}
 .pdf-total-lbl{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#7A8FAD}
 .pdf-total-val{font-family:'Bebas Neue',sans-serif;font-size:24px;color:#C8A84B}
 .pdf-footer{margin-top:24px;padding-top:12px;border-top:1px solid #C8D3E8;font-size:10px;color:#7A8FAD;line-height:1.8}
+.b-cmr-brouillon{background:#eee;color:#666}
+.b-cmr-charge{background:#FDEBD0;color:#B9770E}
+.b-cmr-transit{background:#D6EAF8;color:#1F618D}
+.b-cmr-livre{background:#D5F5E3;color:#1E8449}
+.b-cmr-cloture{background:#0B1929;color:#C8A84B}
+.sig-box{border:1.5px dashed var(--border);border-radius:10px;background:#fff;margin-bottom:6px;overflow:hidden}
+.sig-pad{width:100%;height:110px;display:block;touch-action:none;cursor:crosshair}
+.sig-done{border-color:var(--green);background:#F4FCF7}
+.sig-img{width:100%;height:110px;object-fit:contain;background:#fff;display:block}
+.sig-meta{font-size:10px;color:var(--grey);margin-bottom:10px}
+.hash-box{background:var(--navy);color:var(--gold2);border-radius:10px;padding:12px;font-family:monospace;font-size:11px;word-break:break-all;margin-top:8px;line-height:1.6}
+.cmr-step{font-size:11px;color:var(--grey);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin:14px 0 8px;padding-top:12px;border-top:1px solid var(--light)}
 .pdf-close-btn{position:fixed;top:20px;right:20px;background:var(--red);color:white;border:none;border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;z-index:301;display:flex;align-items:center;justify-content:center}
 .pdf-print-btn{display:block;width:100%;max-width:600px;margin:12px auto 0;padding:14px;background:var(--gold);color:var(--navy);border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer}
 @media print{#nav,#hdr,.btn,button,.overlay,.toast{display:none!important}#content{overflow:visible!important;height:auto!important}.page{display:block!important;padding:0!important}.page:not(.print-active){display:none!important}body{background:white!important;color:black!important}}
@@ -501,7 +513,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
 <!-- OPÉRATIONNEL -->
 <div class="page" id="p-ops">
   <div class="pg-title">🛣️ Opérationnel</div>
-  <div class="tab-row"><div class="tab-pill on" id="ops-tab-trajet" onclick="opsTab('trajet')">🛣️ Trajets</div><div class="tab-pill" id="ops-tab-carbu" onclick="opsTab('carbu')">⛽ Pleins</div><div class="tab-pill" id="ops-tab-maint" onclick="opsTab('maint')">🔧 Entretien</div></div>
+  <div class="tab-row"><div class="tab-pill on" id="ops-tab-trajet" onclick="opsTab('trajet')">🛣️ Trajets</div><div class="tab-pill" id="ops-tab-carbu" onclick="opsTab('carbu')">⛽ Pleins</div><div class="tab-pill" id="ops-tab-maint" onclick="opsTab('maint')">🔧 Entretien</div><div class="tab-pill" id="ops-tab-cmr" onclick="opsTab('cmr')">📄 e-CMR</div></div>
   <div id="ops-trajet">
     <div class="kpi-row" id="ops-kpis"></div>
     <div class="card"><div class="card-ttl">➕ Nouveau Trajet</div><div class="g2"><div class="fg"><label>Date</label><input id="op-date" type="date"></div><div class="fg"><label>Activité</label><select id="op-act"><option value="wf">🌾 Walking Floor</option><option value="pe">🏗️ Plateau</option></select></div></div><div class="g2"><div class="fg"><label>Départ</label><input id="op-dep" placeholder="Luxembourg…"></div><div class="fg"><label>Arrivée</label><input id="op-arr" placeholder="Paris…"></div></div><div class="g2"><div class="fg"><label>Km réels</label><input id="op-km" type="number" placeholder="380" inputmode="numeric"></div><div class="fg"><label>Client</label><input id="op-client" placeholder="BoisLux SA…"></div></div><div class="g2"><div class="fg"><label>HVO100 consommé (L)</label><input id="op-litres" type="number" placeholder="130" inputmode="decimal"></div><div class="fg"><label>CA facturé HT €</label><input id="op-ca" type="number" placeholder="650" inputmode="decimal"></div></div><div class="fg"><label>Notes</label><input id="op-notes" placeholder="Chargement biomasse…"></div><button class="btn bn" onclick="opSaveTrajet()">💾 Enregistrer trajet</button></div>
@@ -516,6 +528,11 @@ tbody td{padding:10px 12px;vertical-align:middle}
     <div id="maint-alerts"></div>
     <div class="card"><div class="card-ttl">➕ Ajouter échéance</div><div class="fg"><label>Type d'échéance</label><select id="mt-type"><optgroup label="🔧 Véhicule — entretien"><option>Vidange huile moteur</option><option>Filtre à carburant</option><option>Filtre à air</option><option>Pneus tracteur</option><option>Pneus remorque</option><option>Freins</option><option>Révision générale</option></optgroup><optgroup label="📋 Véhicule — réglementaire"><option>Contrôle technique</option><option>Tachygraphe (étalonnage)</option><option>Limiteur de vitesse</option><option>Assurance véhicule</option><option>Vignette / Taxe</option><option>Extincteur</option></optgroup><optgroup label="👤 Conducteur"><option>Carte conducteur (tachygraphe)</option><option>FCO / FIMO (CQC)</option><option>Permis CE</option><option>Visite médicale</option><option>Certificat ADR</option></optgroup><optgroup label="🏢 Entreprise"><option>Licence communautaire</option><option>Attestation capacité</option><option>Garantie financière</option></optgroup><option>Autre</option></select></div><div class="g2"><div class="fg"><label>Dernière date</label><input id="mt-last" type="date"></div><div class="fg"><label>Échéance prochaine</label><input id="mt-next" type="date"></div></div><div class="g2"><div class="fg"><label>Km dernier entretien</label><input id="mt-km" type="number" inputmode="numeric" placeholder="140000"></div><div class="fg"><label>Coût €</label><input id="mt-cout" type="number" inputmode="decimal" placeholder="0"></div></div><div class="fg"><label>Notes</label><input id="mt-notes" placeholder="Garage Schmit, Luxembourg…"></div><button class="btn bn" onclick="mtSave()">💾 Enregistrer</button></div>
     <div id="maint-list"></div>
+  </div>
+  <div id="ops-cmr" style="display:none">
+    <div class="kpi-row" id="cmr-kpis"></div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;justify-content:flex-end"><button class="btn bn btn-sm" onclick="cmrOpenModal(0)">➕ Nouveau e-CMR</button><button class="btn bg btn-sm" onclick="cmrExport()">📥 Export</button></div>
+    <div id="cmr-list"></div>
   </div>
 </div>
 
@@ -652,6 +669,75 @@ tbody td{padding:10px 12px;vertical-align:middle}
 
 <div class="overlay" id="ov-crm"><div class="modal"><div class="modal-handle"></div><div class="modal-ttl" id="crm-modal-ttl">Nouveau Prospect</div><div class="fg"><label>Nom / Société *</label><input id="crm-nom" placeholder="Ex: BoisLux S.A."></div><div class="g2"><div class="fg"><label>Pays</label><select id="crm-pays"><option>LU</option><option>FR</option><option>BE</option><option>DE</option><option>NL</option><option>IT</option><option>ES</option><option>CH</option></select></div><div class="fg"><label>Statut</label><select id="crm-statut"><option>Prospect</option><option>Contacté</option><option>Devis envoyé</option><option>Négociation</option><option>Client</option><option>Inactif</option></select></div></div><div class="fg"><label>Filière</label><select id="crm-fil"><optgroup label="🌾 Walking Floor"><option>Bois / Biomasse</option><option>Agricole</option><option>Compost</option><option>Recyclage</option><option>Big Bags</option><option>Palettes (vrac)</option><option>Granulats / Pierre</option><option>Déchets verts</option></optgroup><optgroup label="🏗️ Plateau"><option>Engins BTP (pelleteuses, compacteurs)</option><option>Engins BTP — hors-gabarit</option><option>Conteneur maritime 20ft</option><option>Conteneur maritime 40ft</option><option>Machines agricoles</option><option>Matériaux construction (acier, préfab)</option><option>Big Bags / Palettes (plateau)</option><option>Équipements industriels</option></optgroup></select></div><div class="g2"><div class="fg"><label>CA potentiel €/an</label><input id="crm-ca" type="number" inputmode="numeric"></div><div class="fg"><label>Trajets / mois</label><input id="crm-traj" type="number" inputmode="numeric"></div></div><div class="fg"><label>Téléphone</label><input id="crm-tel" type="tel" placeholder="+352 6x xx xx xx"></div><div class="fg"><label>Email</label><input id="crm-email" type="email"></div><div class="fg"><label>Notes</label><input id="crm-notes" placeholder="Notes libres…"></div><input type="hidden" id="crm-edit-id" value="0"><div class="modal-btns"><button class="btn bgy" onclick="closeModal('ov-crm')">Annuler</button><button class="btn bn" onclick="crmSave()">💾 Enregistrer</button></div></div></div>
 <div class="overlay" id="ov-pipe"><div class="modal"><div class="modal-handle"></div><div class="modal-ttl">Entrée Pipeline</div><div class="fg"><label>Client *</label><input id="pipe-client"></div><div class="fg"><label>Filière</label><select id="pipe-fil"><option>Bois / Biomasse</option><option>Agricole</option><option>Engins BTP (pelleteuses, compacteurs)</option><option>Conteneur maritime 20ft</option><option>Machines agricoles</option></select></div><div class="fg"><label>Statut</label><select id="pipe-stat"><option>Prospect</option><option>Contacté</option><option>Devis envoyé</option><option>Négociation</option><option>Client</option></select></div><div class="g2"><div class="fg"><label>Départ</label><input id="pipe-dep"></div><div class="fg"><label>Arrivée</label><input id="pipe-arr"></div><div class="fg"><label>Km</label><input id="pipe-km" type="number" inputmode="numeric"></div><div class="fg"><label>Montant HT €</label><input id="pipe-ht" type="number" step="0.01" inputmode="decimal"></div></div><div class="fg"><label>Notes</label><input id="pipe-notes"></div><div class="modal-btns"><button class="btn bgy" onclick="closeModal('ov-pipe')">Annuler</button><button class="btn bn" onclick="pipeSave()">💾 Ajouter</button></div></div></div>
+<div class="overlay" id="ov-cmr"><div class="modal">
+  <div class="modal-handle"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div class="modal-ttl" id="cmr-modal-ttl" style="margin-bottom:0">Nouveau e-CMR</div>
+    <span class="badge" id="cmr-badge-statut">Brouillon</span>
+  </div>
+  <div class="fg"><label>Référence</label><input id="cmr-ref" readonly style="background:var(--light);color:var(--grey)"></div>
+
+  <div class="fg"><label>Importer depuis un trajet récent</label><div style="display:flex;gap:8px"><select id="cmr-imp-traj" style="flex:1"><option value="">— aucun —</option></select><button class="btn bgy btn-sm" onclick="cmrImportTrajet()" style="flex:0 0 auto">↙️ Importer</button></div></div>
+
+  <div class="cmr-step">1 · Expéditeur</div>
+  <div class="fg"><label>Nom / Société *</label><input id="cmr-exp-nom" placeholder="Ex: BoisLux S.A."></div>
+  <div class="fg"><label>Adresse</label><input id="cmr-exp-adr" placeholder="Rue, code postal, ville, pays"></div>
+
+  <div class="cmr-step">2 · Transporteur</div>
+  <div class="fg" style="margin-bottom:6px"><div style="background:var(--light);border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.7"><strong>BlackDog Trucking Sàrl-S</strong><br>Luxembourg · Transport international GVN · HVO100<br>Tracteur MAN TGX 18.510 · Remorque plateau GVN</div></div>
+
+  <div class="cmr-step">3 · Destinataire</div>
+  <div class="fg"><label>Nom / Société * <span style="font-size:10px;color:var(--gold);font-weight:400">— chercher ou créer</span></label><input id="cmr-dest-nom" placeholder="Tapez un nom de société…" autocomplete="off" oninput="cmrClientInput()"><div id="cmr-crm-sug"></div></div>
+  <div class="fg"><label>Adresse de livraison</label><input id="cmr-dest-adr" placeholder="Rue, code postal, ville, pays"></div>
+
+  <div class="cmr-step">4 · Transport</div>
+  <div class="g2"><div class="fg"><label>Lieu de chargement *</label><input id="cmr-lieu-charge" placeholder="Luxembourg…"></div><div class="fg"><label>Date de chargement</label><input id="cmr-date-charge" type="date"></div></div>
+  <div class="g2"><div class="fg"><label>Lieu de livraison *</label><input id="cmr-lieu-livr" placeholder="Paris…"></div><div class="fg"><label>Date livraison prévue</label><input id="cmr-date-livr" type="date"></div></div>
+
+  <div class="cmr-step">5 · Marchandise</div>
+  <div class="fg"><label>Nature de la marchandise *</label><input id="cmr-marchandise" placeholder="Ex: Palettes de dallage en pierre naturelle"></div>
+  <div class="g2"><div class="fg"><label>Nb colis / palettes</label><input id="cmr-colis" type="number" inputmode="numeric"></div><div class="fg"><label>Emballage</label><input id="cmr-embal" placeholder="Palettes filmées…"></div></div>
+  <div class="g2"><div class="fg"><label>Poids brut (kg) *</label><input id="cmr-poids" type="number" inputmode="numeric"></div><div class="fg"><label>Volume (m³)</label><input id="cmr-volume" type="number" step="0.1" inputmode="decimal"></div></div>
+  <div class="fg"><label>Instructions de l'expéditeur / douane</label><input id="cmr-instr" placeholder="T1, franco de port, etc."></div>
+
+  <div id="cmr-sig-exp-wrap" class="cmr-step" style="display:none">6 · Signature expéditeur (prise en charge)</div>
+  <div id="cmr-sig-exp-area" style="display:none">
+    <div class="sig-box" id="cmr-sig-exp-box"><canvas id="cmr-sig-exp" class="sig-pad"></canvas></div>
+    <div class="sig-meta" id="cmr-sig-exp-meta">Signez avec le doigt ou la souris</div>
+    <div class="brow"><button class="btn bgy btn-sm" onclick="sigClear('exp')">🧹 Effacer</button><button class="btn bn btn-sm" onclick="cmrSign('exp')">✍️ Valider signature</button></div>
+  </div>
+
+  <div id="cmr-sig-transp-wrap" class="cmr-step" style="display:none">7 · Signature transporteur (chargement)</div>
+  <div id="cmr-sig-transp-area" style="display:none">
+    <div class="sig-box" id="cmr-sig-transp-box"><canvas id="cmr-sig-transp" class="sig-pad"></canvas></div>
+    <div class="sig-meta" id="cmr-sig-transp-meta">Signature du chauffeur</div>
+    <div class="brow"><button class="btn bgy btn-sm" onclick="sigClear('transp')">🧹 Effacer</button><button class="btn bn btn-sm" onclick="cmrSign('transp')">✍️ Valider signature</button></div>
+  </div>
+
+  <div id="cmr-livr-wrap" style="display:none">
+    <div class="cmr-step">8 · Livraison</div>
+    <div class="fg"><label>Réserves à la livraison</label><input id="cmr-reserves" placeholder="RAS, ou détail des avaries/manquants constatés"></div>
+    <div class="fg" style="margin-top:4px">9 · Signature destinataire</div>
+    <div class="sig-box" id="cmr-sig-dest-box"><canvas id="cmr-sig-dest" class="sig-pad"></canvas></div>
+    <div class="sig-meta" id="cmr-sig-dest-meta">Signature du destinataire à réception</div>
+    <div class="brow"><button class="btn bgy btn-sm" onclick="sigClear('dest')">🧹 Effacer</button><button class="btn bn btn-sm" onclick="cmrSign('dest')">✍️ Valider signature</button></div>
+  </div>
+
+  <div id="cmr-hash-wrap" style="display:none">
+    <div class="cmr-step">🔒 Scellement numérique</div>
+    <div class="hash-box" id="cmr-hash-box"></div>
+  </div>
+
+  <input type="hidden" id="cmr-edit-id" value="0">
+  <div class="modal-btns" style="flex-wrap:wrap">
+    <button class="btn bgy" onclick="closeModal('ov-cmr')">Fermer</button>
+    <button class="btn bn" id="cmr-btn-save" onclick="cmrSaveDraft()">💾 Enregistrer</button>
+    <button class="btn bgo" id="cmr-btn-livre" style="display:none" onclick="cmrMarkLivre()">🚚 Marquer livré</button>
+    <button class="btn bg" id="cmr-btn-cloture" style="display:none" onclick="cmrCloture()">🔒 Clôturer & sceller</button>
+    <button class="btn bn" id="cmr-btn-pdf" style="display:none" onclick="cmrPdf()">📋 PDF</button>
+    <button class="btn br" id="cmr-btn-del" style="display:none" onclick="cmrDelete()">🗑 Supprimer</button>
+  </div>
+</div></div>
 
 <div id="pdf-preview"><button class="pdf-close-btn" onclick="closePdf()">✕</button><div id="pdf-doc"></div><button class="pdf-print-btn" onclick="window.print()">🖨️ Imprimer / Enregistrer PDF</button></div>
 <div class="toast" id="toast"></div>
@@ -755,6 +841,7 @@ var fuelPrices  = load('fuelPrices',[]);
 var drvTemps    = load('drvTemps',[]);
 var drvFrais    = load('drvFrais',[]);
 var negHist     = load('negHist',[]);
+var cmrDocs     = load('cmr',[]);
 
 var qAct = {dv:'pe',fv:'pe'};
 var qLast = {dv:null,fv:null};
@@ -1336,14 +1423,14 @@ function pipeExport(){
    OPÉRATIONNEL
 ============================================================ */
 function opsTab(t){
-  var tabs=['trajet','carbu','maint'],i;
+  var tabs=['trajet','carbu','maint','cmr'],i;
   for(i=0;i<tabs.length;i++){
     var pill=$('ops-tab-'+tabs[i]); if(pill) pill.className='tab-pill'+(tabs[i]===t?' on':'');
     var pane=$('ops-'+tabs[i]); if(pane) pane.style.display=(tabs[i]===t?'block':'none');
   }
   opsRenderAll();
 }
-function opsRenderAll(){ opsRenderTrajets(); opsRenderPleins(); opsRenderMaint(); }
+function opsRenderAll(){ opsRenderTrajets(); opsRenderPleins(); opsRenderMaint(); cmrRender(); }
 function opsRenderTrajets(){
   var km=0, ca=0, lit=0, i;
   for(i=0;i<trajets.length;i++){ km+=(+trajets[i].km||0); ca+=(+trajets[i].ca||0); lit+=(+trajets[i].litres||0); }
@@ -1419,6 +1506,291 @@ function mtSave(){
   opsRenderMaint(); showToast('Échéance enregistrée','ok');
 }
 function opDelMaint(id){ maintenance=maintenance.filter(function(m){ return m.id!==id; }); save('maintenance',maintenance); opsRenderMaint(); }
+
+/* ============================================================
+   e-CMR — LETTRE DE VOITURE ÉLECTRONIQUE
+   Protocole additionnel Convention CMR (Genève, 2008) — art. L.3222-6 Code des transports
+============================================================ */
+var CMR_STATUTS_LBL={brouillon:'Brouillon',charge:'Chargé',transit:'En transit',livre:'Livré',cloture:'Clôturé'};
+function cmrBadgeCls(s){ return {'brouillon':'b-cmr-brouillon','charge':'b-cmr-charge','transit':'b-cmr-transit','livre':'b-cmr-livre','cloture':'b-cmr-cloture'}[s]||'b-cmr-brouillon'; }
+function cmrNewRef(){ return 'CMR-'+new Date().getFullYear()+'-'+String(uid()).slice(-5); }
+
+function cmrKpis(){
+  var total=cmrDocs.length, transit=0, cloture=0, i;
+  for(i=0;i<cmrDocs.length;i++){ if(cmrDocs[i].statut==='transit'||cmrDocs[i].statut==='charge') transit++; if(cmrDocs[i].statut==='cloture') cloture++; }
+  st('cmr-kpis',
+    '<div class="kpi"><div class="kpi-v">'+total+'</div><div class="kpi-l">e-CMR</div></div>'+
+    '<div class="kpi"><div class="kpi-v">'+transit+'</div><div class="kpi-l">En cours</div></div>'+
+    '<div class="kpi"><div class="kpi-v">'+cloture+'</div><div class="kpi-l">Scellés</div></div>');
+}
+function cmrRender(){
+  cmrKpis();
+  if(!cmrDocs.length){ st('cmr-list','<div class="card" style="text-align:center;color:var(--grey)">Aucun e-CMR. Créez-en un ➕</div>'); return; }
+  var h='',i;
+  var sorted=cmrDocs.slice().sort(function(a,b){ return (b.dateCreation||'').localeCompare(a.dateCreation||''); });
+  for(i=0;i<sorted.length;i++){ var c=sorted[i];
+    h+='<div class="op-item" style="cursor:pointer" onclick="cmrOpenModal('+c.id+')"><div class="op-icon">📄</div><div class="op-body"><div class="op-ttl">'+esc(c.ref)+' — '+esc(c.destNom||'?')+'</div><div class="op-sub">'+esc(c.lieuCharge||'?')+' → '+esc(c.lieuLivr||'?')+(c.dateCharge?(' · '+frDate(c.dateCharge)):'')+'</div></div><div class="op-val"><span class="badge '+cmrBadgeCls(c.statut)+'">'+esc(CMR_STATUTS_LBL[c.statut]||c.statut)+'</span></div></div>';
+  }
+  st('cmr-list',h);
+}
+
+function cmrClientInput(){
+  var q=gv('cmr-dest-nom').trim().toLowerCase(); var box=$('cmr-crm-sug');
+  if(!box) return;
+  if(q.length<2){ box.innerHTML=''; return; }
+  var matches=prospects.filter(function(p){ return (p.nom||'').toLowerCase().indexOf(q)>=0; }).slice(0,5);
+  if(!matches.length){ box.innerHTML=''; return; }
+  var h='<div class="crm-sug-box">',i;
+  for(i=0;i<matches.length;i++){
+    h+='<div class="crm-sug-item" onclick="cmrPickClient('+matches[i].id+')"><strong>'+esc(matches[i].nom)+'</strong><br><span style="font-size:11px;color:var(--grey)">'+esc(matches[i].pays)+' · '+esc(matches[i].fil||'')+'</span></div>';
+  }
+  h+='</div>'; box.innerHTML=h;
+}
+function cmrPickClient(id){
+  var i; for(i=0;i<prospects.length;i++){ if(prospects[i].id===id){ sv('cmr-dest-nom',prospects[i].nom); break; } }
+  st('cmr-crm-sug','');
+}
+
+function cmrImportTrajetsFill(){
+  var sel=$('cmr-imp-traj'); if(!sel) return;
+  var sorted=trajets.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+  var h='<option value="">— aucun —</option>',i;
+  for(i=0;i<sorted.length&&i<30;i++){ var t=sorted[i];
+    h+='<option value="'+t.id+'">'+frDate(t.date)+' · '+esc(t.dep||'?')+' → '+esc(t.arr||'?')+(t.client?(' · '+esc(t.client)):'')+'</option>'; }
+  sel.innerHTML=h;
+}
+function cmrImportTrajet(){
+  var id=+gv('cmr-imp-traj'); if(!id) return;
+  var i; for(i=0;i<trajets.length;i++){ if(trajets[i].id===id){ var t=trajets[i];
+    sv('cmr-lieu-charge',t.dep||''); sv('cmr-lieu-livr',t.arr||''); sv('cmr-date-charge',t.date||todayISO());
+    if(t.client) sv('cmr-dest-nom',t.client);
+    showToast('Trajet importé','ok'); break; } }
+}
+
+/* ---- Pads de signature (canvas tactile) ---- */
+var sigState={}; // {exp:{ctx,drawing,empty,canvas}, transp:{...}, dest:{...}}
+function sigSetup(who){
+  var cv=$('cmr-sig-'+who); if(!cv) return;
+  var rect=cv.getBoundingClientRect();
+  var ratio=window.devicePixelRatio||1;
+  cv.width=Math.max(rect.width,280)*ratio; cv.height=110*ratio;
+  var ctx=cv.getContext('2d'); ctx.scale(ratio,ratio); ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.strokeStyle='#0B1929';
+  sigState[who]={ctx:ctx,canvas:cv,drawing:false,empty:true,lastX:0,lastY:0};
+  function pos(ev){ var r=cv.getBoundingClientRect(); var p=(ev.touches&&ev.touches[0])||ev; return {x:p.clientX-r.left,y:p.clientY-r.top}; }
+  function start(ev){ ev.preventDefault(); var p=pos(ev); var st=sigState[who]; st.drawing=true; st.empty=false; st.lastX=p.x; st.lastY=p.y; }
+  function move(ev){ var st=sigState[who]; if(!st||!st.drawing) return; ev.preventDefault(); var p=pos(ev);
+    st.ctx.beginPath(); st.ctx.moveTo(st.lastX,st.lastY); st.ctx.lineTo(p.x,p.y); st.ctx.stroke(); st.lastX=p.x; st.lastY=p.y; }
+  function end(ev){ var st=sigState[who]; if(st) st.drawing=false; }
+  cv.onmousedown=start; cv.onmousemove=move; window.addEventListener('mouseup',end);
+  cv.ontouchstart=start; cv.ontouchmove=move; cv.ontouchend=end;
+}
+function sigClear(who){
+  var st=sigState[who]; if(!st) return;
+  st.ctx.clearRect(0,0,st.canvas.width,st.canvas.height); st.empty=true;
+  var box=$('cmr-sig-'+who+'-box'); if(box) box.classList.remove('sig-done');
+}
+function sigCaptureDataURL(who){
+  var st=sigState[who]; if(!st||st.empty) return null;
+  return st.canvas.toDataURL('image/png');
+}
+
+/* ---- Hash SHA-256 (intégrité) ---- */
+function cmrHashPayload(c){
+  return JSON.stringify({ref:c.ref,expNom:c.expNom,expAdr:c.expAdr,destNom:c.destNom,destAdr:c.destAdr,
+    lieuCharge:c.lieuCharge,dateCharge:c.dateCharge,lieuLivr:c.lieuLivr,dateLivr:c.dateLivr,
+    marchandise:c.marchandise,colis:c.colis,embal:c.embal,poids:c.poids,volume:c.volume,instr:c.instr,
+    reserves:c.reserves,sigExp:c.sigExp,sigTransp:c.sigTransp,sigDest:c.sigDest,
+    sigExpTs:c.sigExpTs,sigTranspTs:c.sigTranspTs,sigDestTs:c.sigDestTs});
+}
+function sha256Hex(str){
+  try{
+    var enc=new TextEncoder().encode(str);
+    return crypto.subtle.digest('SHA-256',enc).then(function(buf){
+      var arr=Array.from(new Uint8Array(buf));
+      return arr.map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+    });
+  }catch(e){ return Promise.reject(e); }
+}
+
+/* ---- Ouverture / état du modal ---- */
+function cmrGetById(id){ var i; for(i=0;i<cmrDocs.length;i++){ if(cmrDocs[i].id===id) return cmrDocs[i]; } return null; }
+function cmrOpenModal(id){
+  cmrEditId=id||0; sv('cmr-edit-id',cmrEditId);
+  cmrImportTrajetsFill();
+  var c=id?cmrGetById(id):null;
+  if(c){
+    sv('cmr-ref',c.ref); sv('cmr-exp-nom',c.expNom||''); sv('cmr-exp-adr',c.expAdr||'');
+    sv('cmr-dest-nom',c.destNom||''); sv('cmr-dest-adr',c.destAdr||'');
+    sv('cmr-lieu-charge',c.lieuCharge||''); sv('cmr-date-charge',c.dateCharge||'');
+    sv('cmr-lieu-livr',c.lieuLivr||''); sv('cmr-date-livr',c.dateLivr||'');
+    sv('cmr-marchandise',c.marchandise||''); sv('cmr-colis',c.colis||''); sv('cmr-embal',c.embal||'');
+    sv('cmr-poids',c.poids||''); sv('cmr-volume',c.volume||''); sv('cmr-instr',c.instr||'');
+    sv('cmr-reserves',c.reserves||'');
+    st('cmr-modal-ttl','e-CMR '+c.ref);
+  } else {
+    sv('cmr-ref',cmrNewRef()); sv('cmr-exp-nom',''); sv('cmr-exp-adr','');
+    sv('cmr-dest-nom',''); sv('cmr-dest-adr','');
+    sv('cmr-lieu-charge',''); sv('cmr-date-charge',todayISO());
+    sv('cmr-lieu-livr',''); sv('cmr-date-livr','');
+    sv('cmr-marchandise',''); sv('cmr-colis',''); sv('cmr-embal','');
+    sv('cmr-poids',''); sv('cmr-volume',''); sv('cmr-instr',''); sv('cmr-reserves','');
+    st('cmr-modal-ttl','Nouveau e-CMR');
+  }
+  var statut=c?c.statut:'brouillon';
+  st('cmr-badge-statut',CMR_STATUTS_LBL[statut]);
+  $('cmr-badge-statut').className='badge '+cmrBadgeCls(statut);
+
+  // affichage progressif des étapes signature selon statut
+  var showExp=!!c, showTransp=!!c, showLivr=(statut==='transit'||statut==='livre'||statut==='cloture');
+  $('cmr-sig-exp-wrap').style.display=showExp?'block':'none';
+  $('cmr-sig-exp-area').style.display=showExp?'block':'none';
+  $('cmr-sig-transp-wrap').style.display=showTransp?'block':'none';
+  $('cmr-sig-transp-area').style.display=showTransp?'block':'none';
+  $('cmr-livr-wrap').style.display=showLivr?'block':'none';
+  $('cmr-hash-wrap').style.display=(statut==='cloture')?'block':'none';
+
+  var readonly=(statut==='cloture');
+  ['cmr-exp-nom','cmr-exp-adr','cmr-dest-nom','cmr-dest-adr','cmr-lieu-charge','cmr-date-charge','cmr-lieu-livr','cmr-date-livr','cmr-marchandise','cmr-colis','cmr-embal','cmr-poids','cmr-volume','cmr-instr','cmr-reserves'].forEach(function(id){
+    var e=$(id); if(e) e.readOnly=readonly;
+  });
+
+  $('cmr-btn-save').style.display=readonly?'none':'flex';
+  $('cmr-btn-livre').style.display=(statut==='transit')?'flex':'none';
+  $('cmr-btn-cloture').style.display=(statut==='livre')?'flex':'none';
+  $('cmr-btn-pdf').style.display=c?'flex':'none';
+  $('cmr-btn-del').style.display=c?'flex':'none';
+
+  $('ov-cmr').classList.add('open');
+
+  // setup canvases + affichage des signatures déjà capturées
+  setTimeout(function(){
+    if(showExp) cmrRestoreSig('exp',c&&c.sigExp,c&&c.sigExpTs);
+    if(showTransp) cmrRestoreSig('transp',c&&c.sigTransp,c&&c.sigTranspTs);
+    if(showLivr) cmrRestoreSig('dest',c&&c.sigDest,c&&c.sigDestTs);
+    if(statut==='cloture') st('cmr-hash-box','Empreinte SHA-256 (intégrité) :<br>'+(c.hash||'')+'<br><br>Scellé le '+frDate((c.hashDate||'').slice(0,10))+' à '+((c.hashDate||'').slice(11,16)||''));
+  },30);
+}
+function cmrRestoreSig(who,dataUrl,ts){
+  var area=$('cmr-sig-'+who+'-area')||$('cmr-livr-wrap');
+  if(dataUrl){
+    var box=$('cmr-sig-'+who+'-box');
+    box.innerHTML='<img class="sig-img" src="'+dataUrl+'">';
+    box.classList.add('sig-done');
+    st('cmr-sig-'+who+'-meta','✓ Signé le '+frDate((ts||'').slice(0,10))+' à '+((ts||'').slice(11,16)||''));
+  } else {
+    var box2=$('cmr-sig-'+who+'-box');
+    if(box2 && box2.querySelector('canvas')===null){
+      box2.innerHTML='<canvas id="cmr-sig-'+who+'" class="sig-pad"></canvas>';
+    }
+    sigSetup(who);
+  }
+}
+
+function cmrCollect(){
+  return {ref:gv('cmr-ref'), expNom:gv('cmr-exp-nom').trim(), expAdr:gv('cmr-exp-adr'),
+    destNom:gv('cmr-dest-nom').trim(), destAdr:gv('cmr-dest-adr'),
+    lieuCharge:gv('cmr-lieu-charge').trim(), dateCharge:gv('cmr-date-charge'),
+    lieuLivr:gv('cmr-lieu-livr').trim(), dateLivr:gv('cmr-date-livr'),
+    marchandise:gv('cmr-marchandise').trim(), colis:gv('cmr-colis'), embal:gv('cmr-embal'),
+    poids:gv('cmr-poids'), volume:gv('cmr-volume'), instr:gv('cmr-instr'), reserves:gv('cmr-reserves')};
+}
+function cmrSaveDraft(){
+  var d=cmrCollect();
+  if(!d.expNom||!d.destNom||!d.lieuCharge||!d.lieuLivr||!d.marchandise||!d.poids){
+    showToast('Champs requis : expéditeur, destinataire, lieux, marchandise, poids','err'); return;
+  }
+  var id=+gv('cmr-edit-id')||0;
+  if(id){
+    var i; for(i=0;i<cmrDocs.length;i++){ if(cmrDocs[i].id===id){
+      var old=cmrDocs[i]; d.id=id; d.statut=old.statut; d.dateCreation=old.dateCreation;
+      d.sigExp=old.sigExp; d.sigExpTs=old.sigExpTs; d.sigTransp=old.sigTransp; d.sigTranspTs=old.sigTranspTs;
+      d.sigDest=old.sigDest; d.sigDestTs=old.sigDestTs; d.hash=old.hash; d.hashDate=old.hashDate;
+      cmrDocs[i]=d; break; } }
+    save('cmr',cmrDocs); showToast('e-CMR mis à jour','ok'); cmrRender(); cmrOpenModal(id);
+  } else {
+    d.id=uid(); d.statut='brouillon'; d.dateCreation=todayISO();
+    d.sigExp=null; d.sigTransp=null; d.sigDest=null;
+    cmrDocs.push(d); save('cmr',cmrDocs); showToast('e-CMR créé','ok'); cmrRender(); cmrOpenModal(d.id);
+  }
+}
+function cmrSign(who){
+  var dataUrl=sigCaptureDataURL(who);
+  if(!dataUrl){ showToast('Signature vide','err'); return; }
+  var id=+gv('cmr-edit-id')||0; var c=cmrGetById(id);
+  if(!c){ showToast('Enregistrez d\'abord le e-CMR','err'); return; }
+  var ts=new Date().toISOString();
+  if(who==='exp'){ c.sigExp=dataUrl; c.sigExpTs=ts; c.statut='charge'; }
+  else if(who==='transp'){ c.sigTransp=dataUrl; c.sigTranspTs=ts; c.statut='transit'; }
+  else if(who==='dest'){ c.sigDest=dataUrl; c.sigDestTs=ts; }
+  save('cmr',cmrDocs);
+  showToast('Signature enregistrée','ok');
+  cmrRender(); cmrOpenModal(id);
+}
+function cmrMarkLivre(){
+  var id=+gv('cmr-edit-id')||0; var c=cmrGetById(id); if(!c) return;
+  if(!c.sigDest){ showToast('Signature destinataire requise','err'); return; }
+  c.reserves=gv('cmr-reserves'); c.statut='livre'; save('cmr',cmrDocs);
+  showToast('Livraison enregistrée','ok'); cmrRender(); cmrOpenModal(id);
+}
+function cmrCloture(){
+  var id=+gv('cmr-edit-id')||0; var c=cmrGetById(id); if(!c) return;
+  var payload=cmrHashPayload(c);
+  showToast('Scellement en cours…');
+  sha256Hex(payload).then(function(hex){
+    c.hash=hex; c.hashDate=new Date().toISOString(); c.statut='cloture';
+    save('cmr',cmrDocs); showToast('e-CMR scellé et archivé','ok');
+    cmrRender(); cmrOpenModal(id);
+  }).catch(function(){
+    // repli si crypto.subtle indisponible (contexte non sécurisé) : horodatage seul, sans empreinte
+    c.hash='(indisponible hors HTTPS)'; c.hashDate=new Date().toISOString(); c.statut='cloture';
+    save('cmr',cmrDocs); showToast('e-CMR clôturé (sans empreinte crypto — HTTPS requis)','err');
+    cmrRender(); cmrOpenModal(id);
+  });
+}
+function cmrDelete(){
+  var id=+gv('cmr-edit-id')||0; if(!id) return;
+  if(!confirm('Supprimer définitivement ce e-CMR ?')) return;
+  cmrDocs=cmrDocs.filter(function(c){ return c.id!==id; });
+  save('cmr',cmrDocs); closeModal('ov-cmr'); cmrRender(); showToast('e-CMR supprimé');
+}
+
+function cmrPdf(){
+  var id=+gv('cmr-edit-id')||0; var c=cmrGetById(id); if(!c) return;
+  var sigRow=function(lbl,img,ts){
+    return '<div style="flex:1"><div style="font-size:10px;color:#7A8FAD;margin-bottom:4px">'+lbl+(ts?(' — '+frDate(ts.slice(0,10))+' '+ts.slice(11,16)):'')+'</div>'+
+      (img?'<img src="'+img+'" style="width:100%;height:60px;object-fit:contain;border:1px solid #C8D3E8;border-radius:6px">':'<div style="width:100%;height:60px;border:1px dashed #C8D3E8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#C8D3E8;font-size:10px">Non signé</div>')+
+    '</div>';
+  };
+  var html=''+
+  '<div class="pdf-hdr"><div><div class="pdf-logo">🐾 BLACKDOG TRUCKING</div><div class="pdf-sub">Sàrl-S · Luxembourg · Transport international GVN · HVO100</div></div><div class="pdf-type">e-CMR</div></div>'+
+  '<div class="pdf-meta">'+
+    '<div><div class="pdf-meta-lbl">Référence</div><div class="pdf-meta-val">'+esc(c.ref)+'</div></div>'+
+    '<div><div class="pdf-meta-lbl">Statut</div><div class="pdf-meta-val">'+esc(CMR_STATUTS_LBL[c.statut]||c.statut)+'</div></div>'+
+    '<div><div class="pdf-meta-lbl">Expéditeur</div><div class="pdf-meta-val">'+esc(c.expNom)+'<br><span style="font-weight:400;font-size:11px">'+esc(c.expAdr||'')+'</span></div></div>'+
+    '<div><div class="pdf-meta-lbl">Destinataire</div><div class="pdf-meta-val">'+esc(c.destNom)+'<br><span style="font-weight:400;font-size:11px">'+esc(c.destAdr||'')+'</span></div></div>'+
+    '<div><div class="pdf-meta-lbl">Lieu / date chargement</div><div class="pdf-meta-val">'+esc(c.lieuCharge)+' · '+frDate(c.dateCharge)+'</div></div>'+
+    '<div><div class="pdf-meta-lbl">Lieu / date livraison</div><div class="pdf-meta-val">'+esc(c.lieuLivr)+(c.dateLivr?(' · '+frDate(c.dateLivr)):'')+'</div></div>'+
+  '</div>'+
+  '<table class="pdf-table"><thead><tr><th>Marchandise</th><th></th></tr></thead><tbody>'+
+    '<tr><td>Nature</td><td>'+esc(c.marchandise)+'</td></tr>'+
+    '<tr><td>Colis / emballage</td><td>'+esc(c.colis||'—')+' · '+esc(c.embal||'—')+'</td></tr>'+
+    '<tr><td>Poids brut</td><td>'+esc(c.poids)+' kg'+(c.volume?(' · '+esc(c.volume)+' m³'):'')+'</td></tr>'+
+    (c.instr?('<tr><td>Instructions</td><td>'+esc(c.instr)+'</td></tr>'):'')+
+    (c.reserves?('<tr><td>Réserves à livraison</td><td>'+esc(c.reserves)+'</td></tr>'):'')+
+  '</tbody></table>'+
+  '<div style="display:flex;gap:10px;margin-top:16px">'+sigRow('Expéditeur',c.sigExp,c.sigExpTs)+sigRow('Transporteur',c.sigTransp,c.sigTranspTs)+sigRow('Destinataire',c.sigDest,c.sigDestTs)+'</div>'+
+  (c.statut==='cloture'?('<div class="hash-box">Sceau d\'intégrité SHA-256 (protocole additionnel CMR 2008) :<br>'+esc(c.hash)+'<br>Clôturé le '+frDate((c.hashDate||'').slice(0,10))+' à '+((c.hashDate||'').slice(11,16)||'')+'</div>'):'')+
+  '<div class="pdf-footer">BlackDog Trucking Sàrl-S · Luxembourg · e-CMR établie conformément au protocole additionnel à la Convention CMR (Genève, 2008) et à l\'art. L.3222-6 du Code des transports français. Valeur juridique équivalente à la lettre de voiture papier dans les pays ayant ratifié le protocole. Conservation légale : 5 ans.</div>';
+  st('pdf-doc',html); $('pdf-preview').style.display='block';
+}
+
+function cmrExport(){
+  if(!cmrDocs.length){ showToast('Aucun e-CMR','err'); return; }
+  var rows=[['Référence','Statut','Expéditeur','Destinataire','Lieu chargement','Date chargement','Lieu livraison','Marchandise','Poids kg','Réserves','Date clôture','Empreinte SHA-256']];
+  var i; for(i=0;i<cmrDocs.length;i++){ var c=cmrDocs[i];
+    rows.push([c.ref,CMR_STATUTS_LBL[c.statut]||c.statut,c.expNom,c.destNom,c.lieuCharge,frDate(c.dateCharge),c.lieuLivr,c.marchandise,c.poids,c.reserves||'',c.hashDate?frDate(c.hashDate.slice(0,10)):'',c.hash||'']); }
+  xlsxDownload(rows,'BlackDog_eCMR','eCMR');
+}
 
 /* ============================================================
    OUTILS
@@ -2124,7 +2496,7 @@ function dataImport(ev){
       for(k in d){ if(k.indexOf('bd_')===0) localStorage.setItem(k,d[k]); }
       prospects=load('prospects',[]); pipeline=load('pipeline',[]); trajets=load('trajets',[]);
       pleins=load('pleins',[]); maintenance=load('maintenance',[]); fuelPrices=load('fuelPrices',[]);
-      drvTemps=load('drvTemps',[]); drvFrais=load('drvFrais',[]); negHist=load('negHist',[]);
+      drvTemps=load('drvTemps',[]); drvFrais=load('drvFrais',[]); negHist=load('negHist',[]); cmrDocs=load('cmr',[]);
       capLoad(); renderHome(); dataRenderInfo();
       showToast('Sauvegarde restaurée','ok');
     }catch(e){ showToast('Fichier invalide','err'); }
