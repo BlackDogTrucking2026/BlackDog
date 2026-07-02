@@ -684,7 +684,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
   <div class="fg"><label>Adresse</label><input id="cmr-exp-adr" placeholder="Rue, code postal, ville, pays"></div>
 
   <div class="cmr-step">2 · Transporteur</div>
-  <div class="fg" style="margin-bottom:6px"><div style="background:var(--light);border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.7"><strong>BlackDog Trucking Sàrl-S</strong><br>Luxembourg · Transport international GVN · HVO100<br>Tracteur MAN TGX 18.510 · Remorque plateau GVN</div></div>
+  <div class="fg" style="margin-bottom:6px"><div id="cmr-transp-info" style="background:var(--light);border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.7"></div></div>
 
   <div class="cmr-step">3 · Destinataire</div>
   <div class="fg"><label>Nom / Société * <span style="font-size:10px;color:var(--gold);font-weight:400">— chercher ou créer</span></label><input id="cmr-dest-nom" placeholder="Tapez un nom de société…" autocomplete="off" oninput="cmrClientInput()"><div id="cmr-crm-sug"></div></div>
@@ -699,6 +699,14 @@ tbody td{padding:10px 12px;vertical-align:middle}
   <div class="g2"><div class="fg"><label>Nb colis / palettes</label><input id="cmr-colis" type="number" inputmode="numeric"></div><div class="fg"><label>Emballage</label><input id="cmr-embal" placeholder="Palettes filmées…"></div></div>
   <div class="g2"><div class="fg"><label>Poids brut (kg) *</label><input id="cmr-poids" type="number" inputmode="numeric"></div><div class="fg"><label>Volume (m³)</label><input id="cmr-volume" type="number" step="0.1" inputmode="decimal"></div></div>
   <div class="fg"><label>Instructions de l'expéditeur / douane</label><input id="cmr-instr" placeholder="T1, franco de port, etc."></div>
+
+  <div class="fg" style="margin-bottom:6px"><label class="sc-item" style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="cmr-adr-on" onchange="cmrAdrToggle()"><div><div style="font-weight:600">☣️ Transport ADR (matières dangereuses)</div><div style="font-size:11px;color:var(--grey)">Coche si la marchandise est soumise à l'accord ADR</div></div></label></div>
+  <div id="cmr-adr-fields" style="display:none">
+    <div class="g2"><div class="fg"><label>N° ONU *</label><input id="cmr-adr-un" placeholder="Ex: 1202" inputmode="numeric"></div><div class="fg"><label>Classe ADR *</label><input id="cmr-adr-classe" placeholder="Ex: 3"></div></div>
+    <div class="fg"><label>Désignation officielle de transport *</label><input id="cmr-adr-desig" placeholder="Ex: GAZOLE"></div>
+    <div class="g2"><div class="fg"><label>Groupe d'emballage</label><select id="cmr-adr-groupe"><option value="">—</option><option>I</option><option>II</option><option>III</option></select></div><div class="fg"><label>Étiquettes de danger</label><input id="cmr-adr-eti" placeholder="Ex: 3"></div></div>
+    <div class="fg"><label>N° tél. urgence / consignes</label><input id="cmr-adr-urg" placeholder="Ex: transporteur ADR + fiche de sécurité"></div>
+  </div>
 
   <div id="cmr-sig-exp-wrap" class="cmr-step" style="display:none">6 · Signature expéditeur (prise en charge)</div>
   <div id="cmr-sig-exp-area" style="display:none">
@@ -1530,7 +1538,7 @@ function cmrRender(){
   var h='',i;
   var sorted=cmrDocs.slice().sort(function(a,b){ return (b.dateCreation||'').localeCompare(a.dateCreation||''); });
   for(i=0;i<sorted.length;i++){ var c=sorted[i];
-    h+='<div class="op-item" style="cursor:pointer" onclick="cmrOpenModal('+c.id+')"><div class="op-icon">📄</div><div class="op-body"><div class="op-ttl">'+esc(c.ref)+' — '+esc(c.destNom||'?')+'</div><div class="op-sub">'+esc(c.lieuCharge||'?')+' → '+esc(c.lieuLivr||'?')+(c.dateCharge?(' · '+frDate(c.dateCharge)):'')+'</div></div><div class="op-val"><span class="badge '+cmrBadgeCls(c.statut)+'">'+esc(CMR_STATUTS_LBL[c.statut]||c.statut)+'</span></div></div>';
+    h+='<div class="op-item" style="cursor:pointer" onclick="cmrOpenModal('+c.id+')"><div class="op-icon">'+(c.adrOn?'☣️':'📄')+'</div><div class="op-body"><div class="op-ttl">'+esc(c.ref)+' — '+esc(c.destNom||'?')+'</div><div class="op-sub">'+esc(c.lieuCharge||'?')+' → '+esc(c.lieuLivr||'?')+(c.dateCharge?(' · '+frDate(c.dateCharge)):'')+'</div></div><div class="op-val"><span class="badge '+cmrBadgeCls(c.statut)+'">'+esc(CMR_STATUTS_LBL[c.statut]||c.statut)+'</span></div></div>';
   }
   st('cmr-list',h);
 }
@@ -1600,6 +1608,7 @@ function cmrHashPayload(c){
   return JSON.stringify({ref:c.ref,expNom:c.expNom,expAdr:c.expAdr,destNom:c.destNom,destAdr:c.destAdr,
     lieuCharge:c.lieuCharge,dateCharge:c.dateCharge,lieuLivr:c.lieuLivr,dateLivr:c.dateLivr,
     marchandise:c.marchandise,colis:c.colis,embal:c.embal,poids:c.poids,volume:c.volume,instr:c.instr,
+    adrOn:c.adrOn,adrUn:c.adrUn,adrClasse:c.adrClasse,adrDesig:c.adrDesig,adrGroupe:c.adrGroupe,adrEti:c.adrEti,adrUrg:c.adrUrg,
     reserves:c.reserves,sigExp:c.sigExp,sigTransp:c.sigTransp,sigDest:c.sigDest,
     sigExpTs:c.sigExpTs,sigTranspTs:c.sigTranspTs,sigDestTs:c.sigDestTs});
 }
@@ -1618,6 +1627,11 @@ function cmrGetById(id){ var i; for(i=0;i<cmrDocs.length;i++){ if(cmrDocs[i].id=
 function cmrOpenModal(id){
   cmrEditId=id||0; sv('cmr-edit-id',cmrEditId);
   cmrImportTrajetsFill();
+  var cap=load('capacite',{});
+  st('cmr-transp-info','<strong>BlackDog Trucking Sàrl-S</strong><br>Luxembourg · Transport international GVN · HVO100<br>'+
+    'Tracteur : '+esc(cap.tracteur||'—')+' · Remorque : '+esc(cap.remorque||'—')+
+    (cap.licence?('<br>Licence comm. : '+esc(cap.licence)):'')+
+    '<div style="font-size:10px;color:var(--grey);margin-top:4px">Modifiable dans Outils → Données</div>');
   var c=id?cmrGetById(id):null;
   if(c){
     sv('cmr-ref',c.ref); sv('cmr-exp-nom',c.expNom||''); sv('cmr-exp-adr',c.expAdr||'');
@@ -1627,6 +1641,9 @@ function cmrOpenModal(id){
     sv('cmr-marchandise',c.marchandise||''); sv('cmr-colis',c.colis||''); sv('cmr-embal',c.embal||'');
     sv('cmr-poids',c.poids||''); sv('cmr-volume',c.volume||''); sv('cmr-instr',c.instr||'');
     sv('cmr-reserves',c.reserves||'');
+    var ck=$('cmr-adr-on'); if(ck) ck.checked=!!c.adrOn;
+    sv('cmr-adr-un',c.adrUn||''); sv('cmr-adr-classe',c.adrClasse||''); sv('cmr-adr-desig',c.adrDesig||'');
+    sv('cmr-adr-groupe',c.adrGroupe||''); sv('cmr-adr-eti',c.adrEti||''); sv('cmr-adr-urg',c.adrUrg||'');
     st('cmr-modal-ttl','e-CMR '+c.ref);
   } else {
     sv('cmr-ref',cmrNewRef()); sv('cmr-exp-nom',''); sv('cmr-exp-adr','');
@@ -1635,8 +1652,11 @@ function cmrOpenModal(id){
     sv('cmr-lieu-livr',''); sv('cmr-date-livr','');
     sv('cmr-marchandise',''); sv('cmr-colis',''); sv('cmr-embal','');
     sv('cmr-poids',''); sv('cmr-volume',''); sv('cmr-instr',''); sv('cmr-reserves','');
+    var ck2=$('cmr-adr-on'); if(ck2) ck2.checked=false;
+    sv('cmr-adr-un',''); sv('cmr-adr-classe',''); sv('cmr-adr-desig',''); sv('cmr-adr-groupe',''); sv('cmr-adr-eti',''); sv('cmr-adr-urg','');
     st('cmr-modal-ttl','Nouveau e-CMR');
   }
+  cmrAdrToggle();
   var statut=c?c.statut:'brouillon';
   st('cmr-badge-statut',CMR_STATUTS_LBL[statut]);
   $('cmr-badge-statut').className='badge '+cmrBadgeCls(statut);
@@ -1651,9 +1671,11 @@ function cmrOpenModal(id){
   $('cmr-hash-wrap').style.display=(statut==='cloture')?'block':'none';
 
   var readonly=(statut==='cloture');
-  ['cmr-exp-nom','cmr-exp-adr','cmr-dest-nom','cmr-dest-adr','cmr-lieu-charge','cmr-date-charge','cmr-lieu-livr','cmr-date-livr','cmr-marchandise','cmr-colis','cmr-embal','cmr-poids','cmr-volume','cmr-instr','cmr-reserves'].forEach(function(id){
+  ['cmr-exp-nom','cmr-exp-adr','cmr-dest-nom','cmr-dest-adr','cmr-lieu-charge','cmr-date-charge','cmr-lieu-livr','cmr-date-livr','cmr-marchandise','cmr-colis','cmr-embal','cmr-poids','cmr-volume','cmr-instr','cmr-reserves','cmr-adr-un','cmr-adr-classe','cmr-adr-desig','cmr-adr-eti','cmr-adr-urg'].forEach(function(id){
     var e=$(id); if(e) e.readOnly=readonly;
   });
+  var adrChk=$('cmr-adr-on'); if(adrChk) adrChk.disabled=readonly;
+  var adrGrp=$('cmr-adr-groupe'); if(adrGrp) adrGrp.disabled=readonly;
 
   $('cmr-btn-save').style.display=readonly?'none':'flex';
   $('cmr-btn-livre').style.display=(statut==='transit')?'flex':'none';
@@ -1687,18 +1709,27 @@ function cmrRestoreSig(who,dataUrl,ts){
   }
 }
 
+function cmrAdrToggle(){
+  var on=gc('cmr-adr-on');
+  var box=$('cmr-adr-fields'); if(box) box.style.display=on?'block':'none';
+}
 function cmrCollect(){
   return {ref:gv('cmr-ref'), expNom:gv('cmr-exp-nom').trim(), expAdr:gv('cmr-exp-adr'),
     destNom:gv('cmr-dest-nom').trim(), destAdr:gv('cmr-dest-adr'),
     lieuCharge:gv('cmr-lieu-charge').trim(), dateCharge:gv('cmr-date-charge'),
     lieuLivr:gv('cmr-lieu-livr').trim(), dateLivr:gv('cmr-date-livr'),
     marchandise:gv('cmr-marchandise').trim(), colis:gv('cmr-colis'), embal:gv('cmr-embal'),
-    poids:gv('cmr-poids'), volume:gv('cmr-volume'), instr:gv('cmr-instr'), reserves:gv('cmr-reserves')};
+    poids:gv('cmr-poids'), volume:gv('cmr-volume'), instr:gv('cmr-instr'), reserves:gv('cmr-reserves'),
+    adrOn:gc('cmr-adr-on'), adrUn:gv('cmr-adr-un').trim(), adrClasse:gv('cmr-adr-classe').trim(),
+    adrDesig:gv('cmr-adr-desig').trim(), adrGroupe:gv('cmr-adr-groupe'), adrEti:gv('cmr-adr-eti').trim(), adrUrg:gv('cmr-adr-urg').trim()};
 }
 function cmrSaveDraft(){
   var d=cmrCollect();
   if(!d.expNom||!d.destNom||!d.lieuCharge||!d.lieuLivr||!d.marchandise||!d.poids){
     showToast('Champs requis : expéditeur, destinataire, lieux, marchandise, poids','err'); return;
+  }
+  if(d.adrOn&&(!d.adrUn||!d.adrClasse||!d.adrDesig)){
+    showToast('ADR : N° ONU, classe et désignation requis','err'); return;
   }
   var id=+gv('cmr-edit-id')||0;
   if(id){
@@ -1757,6 +1788,7 @@ function cmrDelete(){
 
 function cmrPdf(){
   var id=+gv('cmr-edit-id')||0; var c=cmrGetById(id); if(!c) return;
+  var cap=load('capacite',{});
   var sigRow=function(lbl,img,ts){
     return '<div style="flex:1"><div style="font-size:10px;color:#7A8FAD;margin-bottom:4px">'+lbl+(ts?(' — '+frDate(ts.slice(0,10))+' '+ts.slice(11,16)):'')+'</div>'+
       (img?'<img src="'+img+'" style="width:100%;height:60px;object-fit:contain;border:1px solid #C8D3E8;border-radius:6px">':'<div style="width:100%;height:60px;border:1px dashed #C8D3E8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#C8D3E8;font-size:10px">Non signé</div>')+
@@ -1771,6 +1803,8 @@ function cmrPdf(){
     '<div><div class="pdf-meta-lbl">Destinataire</div><div class="pdf-meta-val">'+esc(c.destNom)+'<br><span style="font-weight:400;font-size:11px">'+esc(c.destAdr||'')+'</span></div></div>'+
     '<div><div class="pdf-meta-lbl">Lieu / date chargement</div><div class="pdf-meta-val">'+esc(c.lieuCharge)+' · '+frDate(c.dateCharge)+'</div></div>'+
     '<div><div class="pdf-meta-lbl">Lieu / date livraison</div><div class="pdf-meta-val">'+esc(c.lieuLivr)+(c.dateLivr?(' · '+frDate(c.dateLivr)):'')+'</div></div>'+
+    '<div><div class="pdf-meta-lbl">Tracteur</div><div class="pdf-meta-val">'+esc(cap.tracteur||'—')+'</div></div>'+
+    '<div><div class="pdf-meta-lbl">Remorque</div><div class="pdf-meta-val">'+esc(cap.remorque||'—')+'</div></div>'+
   '</div>'+
   '<table class="pdf-table"><thead><tr><th>Marchandise</th><th></th></tr></thead><tbody>'+
     '<tr><td>Nature</td><td>'+esc(c.marchandise)+'</td></tr>'+
@@ -1779,6 +1813,15 @@ function cmrPdf(){
     (c.instr?('<tr><td>Instructions</td><td>'+esc(c.instr)+'</td></tr>'):'')+
     (c.reserves?('<tr><td>Réserves à livraison</td><td>'+esc(c.reserves)+'</td></tr>'):'')+
   '</tbody></table>'+
+  (c.adrOn?(
+  '<table class="pdf-table" style="margin-top:14px;border:2px solid #E67E22"><thead><tr style="background:#E67E22"><th colspan="2" style="color:#fff">☣️ MARCHANDISES DANGEREUSES — ADR</th></tr></thead><tbody>'+
+    '<tr><td>N° ONU</td><td><strong>UN'+esc(c.adrUn)+'</strong></td></tr>'+
+    '<tr><td>Classe ADR</td><td>'+esc(c.adrClasse)+'</td></tr>'+
+    '<tr><td>Désignation officielle</td><td>'+esc(c.adrDesig)+'</td></tr>'+
+    (c.adrGroupe?('<tr><td>Groupe d\'emballage</td><td>'+esc(c.adrGroupe)+'</td></tr>'):'')+
+    (c.adrEti?('<tr><td>Étiquettes de danger</td><td>'+esc(c.adrEti)+'</td></tr>'):'')+
+    (c.adrUrg?('<tr><td>Consignes d\'urgence</td><td>'+esc(c.adrUrg)+'</td></tr>'):'')+
+  '</tbody></table>'):'')+
   '<div style="display:flex;gap:10px;margin-top:16px">'+sigRow('Expéditeur',c.sigExp,c.sigExpTs)+sigRow('Transporteur',c.sigTransp,c.sigTranspTs)+sigRow('Destinataire',c.sigDest,c.sigDestTs)+'</div>'+
   (c.statut==='cloture'?('<div class="hash-box">Sceau d\'intégrité SHA-256 (protocole additionnel CMR 2008) :<br>'+esc(c.hash)+'<br>Clôturé le '+frDate((c.hashDate||'').slice(0,10))+' à '+((c.hashDate||'').slice(11,16)||'')+'</div>'):'')+
   '<div class="pdf-footer">BlackDog Trucking Sàrl-S · Luxembourg · e-CMR établie conformément au protocole additionnel à la Convention CMR (Genève, 2008) et à l\'art. L.3222-6 du Code des transports français. Valeur juridique équivalente à la lettre de voiture papier dans les pays ayant ratifié le protocole. Conservation légale : 5 ans.</div>';
@@ -1787,9 +1830,9 @@ function cmrPdf(){
 
 function cmrExport(){
   if(!cmrDocs.length){ showToast('Aucun e-CMR','err'); return; }
-  var rows=[['Référence','Statut','Expéditeur','Destinataire','Lieu chargement','Date chargement','Lieu livraison','Marchandise','Poids kg','Réserves','Date clôture','Empreinte SHA-256']];
+  var rows=[['Référence','Statut','Expéditeur','Destinataire','Lieu chargement','Date chargement','Lieu livraison','Marchandise','Poids kg','ADR','N° ONU','Classe ADR','Réserves','Date clôture','Empreinte SHA-256']];
   var i; for(i=0;i<cmrDocs.length;i++){ var c=cmrDocs[i];
-    rows.push([c.ref,CMR_STATUTS_LBL[c.statut]||c.statut,c.expNom,c.destNom,c.lieuCharge,frDate(c.dateCharge),c.lieuLivr,c.marchandise,c.poids,c.reserves||'',c.hashDate?frDate(c.hashDate.slice(0,10)):'',c.hash||'']); }
+    rows.push([c.ref,CMR_STATUTS_LBL[c.statut]||c.statut,c.expNom,c.destNom,c.lieuCharge,frDate(c.dateCharge),c.lieuLivr,c.marchandise,c.poids,c.adrOn?'Oui':'Non',c.adrOn?c.adrUn:'',c.adrOn?c.adrClasse:'',c.reserves||'',c.hashDate?frDate(c.hashDate.slice(0,10)):'',c.hash||'']); }
   xlsxDownload(rows,'BlackDog_eCMR','eCMR');
 }
 
