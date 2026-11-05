@@ -154,6 +154,32 @@ tbody td{padding:10px 12px;vertical-align:middle}
 .tab-row{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px}
 .tab-pill{padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--grey)}
 .tab-pill.on{background:var(--navy);color:var(--gold);border-color:var(--navy)}
+/* ---------- FRET ---------- */
+.fr-crit{font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.6;background:var(--light);border-radius:10px;padding:12px;white-space:pre-wrap;word-break:break-word;margin-bottom:10px}
+.fr-boards{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fr-board{display:flex;flex-direction:column;gap:4px;padding:12px;border:1.5px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);background:var(--white)}
+.fr-board b{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.8px;color:var(--navy)}
+.fr-board small{font-size:11px;color:var(--grey);line-height:1.35}
+.fr-board span{font-size:12px;font-weight:600;color:var(--gold)}
+.fr-res{border-radius:12px;padding:14px 16px;margin-bottom:12px;background:var(--navy);border-left:6px solid var(--grey);color:var(--white)}
+.fr-res.ok{border-left-color:var(--green)}.fr-res.warn{border-left-color:var(--orange)}.fr-res.bad{border-left-color:var(--red)}
+.fr-v{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px}
+.fr-res.ok .fr-v{color:var(--green)}.fr-res.warn .fr-v{color:var(--orange)}.fr-res.bad .fr-v{color:var(--red)}
+.fr-kv{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.fr-kv div{display:flex;flex-direction:column}
+.fr-kv span{font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.4px}
+.fr-kv strong{font-family:'Bebas Neue',sans-serif;font-size:19px;color:var(--gold);letter-spacing:.5px}
+.fr-flags{margin:10px 0 0;padding-left:18px;font-size:12px;line-height:1.6;color:#F5C9A0}
+.fr-offer{background:var(--white);border:1px solid var(--border);border-left:6px solid var(--grey);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.fr-offer.ok{border-left-color:var(--green)}.fr-offer.warn{border-left-color:var(--orange)}.fr-offer.bad{border-left-color:var(--red)}
+.fr-lane{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.6px;color:var(--navy)}
+.fr-meta{font-size:12px;color:var(--grey);margin-top:2px}
+.fr-nums{display:flex;flex-wrap:wrap;gap:4px 14px;margin:8px 0;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+.fr-act{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.fr-act select{padding:7px 9px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--white)}
+.fr-act .btn{width:auto;padding:8px 12px;font-size:13px}
+.fr-empty{text-align:center;padding:28px 16px;color:var(--grey);font-size:13px;border:1.5px dashed var(--border);border-radius:12px}
+@media (max-width:360px){.fr-boards{grid-template-columns:1fr}.fr-kv{grid-template-columns:1fr 1fr}}
 .fuel-hvo{color:#27AE60;font-weight:600}
 .fuel-b7{color:#E67E22;font-weight:600}
 .neg-type-btn{padding:10px 8px;border:1.5px solid var(--border);border-radius:8px;background:var(--white);cursor:pointer;text-align:center;transition:all .15s;width:100%}
@@ -651,6 +677,65 @@ tbody td{padding:10px 12px;vertical-align:middle}
   </div>
 </div>
 
+<!-- FRET -->
+<div class="page" id="p-fret">
+  <div class="pg-title">🔎 Recherche de fret</div>
+  <div class="tab-row"><div class="tab-pill on" id="fret-tab-search" onclick="fretTab('search')">🔎 Rechercher</div><div class="tab-pill" id="fret-tab-eval" onclick="fretTab('eval')">🧮 Évaluer</div><div class="tab-pill" id="fret-tab-offers" onclick="fretTab('offers')">📋 Offres</div><div class="tab-pill" id="fret-tab-set" onclick="fretTab('set')">⚙️ Réglages</div></div>
+
+  <div id="fret-search">
+    <div class="card"><div class="card-ttl">🎯 Ce que je cherche</div>
+      <div class="g2"><div class="fg"><label>Pays départ</label><select id="fr-s-fc" onchange="fretCrit()"></select></div><div class="fg"><label>Ville / CP départ</label><input id="fr-s-f" value="Metz 57" oninput="fretCrit()"></div></div>
+      <div class="g2"><div class="fg"><label>Pays arrivée</label><select id="fr-s-tc" onchange="fretCrit()"></select></div><div class="fg"><label>Ville / zone arrivée</label><input id="fr-s-t" placeholder="Madrid, région…" oninput="fretCrit()"></div></div>
+      <div class="g2"><div class="fg"><label>Date chargement</label><input id="fr-s-d" type="date" onchange="fretCrit()"></div><div class="fg"><label>Rayon départ (km)</label><input id="fr-s-r" type="number" value="150" inputmode="numeric" oninput="fretCrit()"></div></div>
+      <div class="g2"><div class="fg"><label>Marchandise</label><select id="fr-s-ty" onchange="fretCrit()"></select></div><div class="fg"><label>Poids max (t)</label><input id="fr-s-w" type="number" step="0.5" inputmode="decimal" oninput="fretCrit()"></div></div>
+    </div>
+    <div class="card"><div class="card-ttl">📋 Critères à coller dans la bourse</div>
+      <div class="fr-crit" id="fr-crit"></div>
+      <button class="btn bgo" onclick="fretCopyCrit()">📋 Copier les critères</button>
+    </div>
+    <div class="card"><div class="card-ttl">🌍 Ouvrir les bourses</div>
+      <div style="font-size:12px;color:var(--grey);margin-bottom:10px;line-height:1.5">Ouvre la bourse, colle les critères, puis reporte les offres intéressantes dans Évaluer. La connexion directe nécessite un accès API chez la bourse.</div>
+      <div class="fr-boards" id="fr-boards"></div>
+    </div>
+  </div>
+
+  <div id="fret-eval" style="display:none">
+    <div class="card"><div class="card-ttl">🚛 Offre trouvée</div>
+      <div class="g2"><div class="fg"><label>Départ *</label><input id="fr-e-from" placeholder="FR Thionville" oninput="fretEval()"></div><div class="fg"><label>Arrivée *</label><input id="fr-e-to" placeholder="ES Saragosse" oninput="fretEval()"></div></div>
+      <div class="g2"><div class="fg"><label>Date</label><input id="fr-e-date" type="date"></div><div class="fg"><label>Bourse</label><select id="fr-e-board"></select></div></div>
+      <div class="fg"><label>Marchandise</label><select id="fr-e-type" onchange="fretEval()"></select></div>
+      <div class="g2"><div class="fg"><label>Poids (t)</label><input id="fr-e-w" type="number" step="0.1" inputmode="decimal" oninput="fretEval()"></div><div class="fg"><label>Longueur (m)</label><input id="fr-e-l" type="number" step="0.1" inputmode="decimal" oninput="fretEval()"></div></div>
+      <div class="g2"><div class="fg"><label>Largeur (m)</label><input id="fr-e-wd" type="number" step="0.01" inputmode="decimal" oninput="fretEval()"></div><div class="fg"><label>Hauteur charge (m)</label><input id="fr-e-h" type="number" step="0.01" inputmode="decimal" oninput="fretEval()"></div></div>
+    </div>
+    <div class="card"><div class="card-ttl">💶 Prix et distance</div>
+      <div class="g2"><div class="fg"><label>Km chargé *</label><input id="fr-e-kc" type="number" inputmode="numeric" oninput="fretEval()"></div><div class="fg"><label>Km à vide (approche)</label><input id="fr-e-kv" type="number" inputmode="numeric" oninput="fretEval()"></div></div>
+      <div class="g2"><div class="fg"><label>Prix proposé (€) *</label><input id="fr-e-p" type="number" inputmode="decimal" oninput="fretEval()"></div><div class="fg"><label>Péages / vignettes (€)</label><input id="fr-e-t" type="number" inputmode="decimal" oninput="fretEval()"></div></div>
+      <div class="fg"><label>Donneur d'ordre / contact</label><input id="fr-e-c" placeholder="Société, nom, téléphone"></div>
+    </div>
+    <div class="fr-res" id="fr-res"><span style="color:var(--grey);font-size:13px">Saisis le km chargé et le prix proposé pour obtenir le verdict.</span></div>
+    <div class="brow"><button class="btn bgo" id="fr-e-save" onclick="fretSave()">💾 Ajouter à mes offres</button><button class="btn bgy" onclick="fretResetEval()" style="flex:0 0 auto;width:auto">🔄</button></div>
+  </div>
+
+  <div id="fret-offers" style="display:none">
+    <div class="kpi-row" id="fr-kpis"></div>
+    <div class="flt-bar"><select id="fr-o-f" onchange="fretRenderOffers()"><option value="">Tous statuts</option></select></div>
+    <div id="fr-list"></div>
+  </div>
+
+  <div id="fret-set" style="display:none">
+    <div class="card"><div class="card-ttl">⚙️ Seuils de rentabilité</div>
+      <div class="g2"><div class="fg"><label>CRK (€/km)</label><input id="fr-c-crk" type="number" step="0.01" inputmode="decimal" oninput="fretSetCfg()"></div><div class="fg"><label>Tarif cible (€/km)</label><input id="fr-c-tgt" type="number" step="0.01" inputmode="decimal" oninput="fretSetCfg()"></div></div>
+      <div class="fg"><label>Vide d'approche max (%)</label><input id="fr-c-vide" type="number" inputmode="numeric" oninput="fretSetCfg()"></div>
+    </div>
+    <div class="card"><div class="card-ttl">🚚 Ensemble Kässbohrer SPS Mega</div>
+      <div class="g2"><div class="fg"><label>Charge utile (t)</label><input id="fr-c-cu" type="number" step="0.1" inputmode="decimal" oninput="fretSetCfg()"></div><div class="fg"><label>Longueur plateau (m)</label><input id="fr-c-len" type="number" step="0.01" inputmode="decimal" oninput="fretSetCfg()"></div></div>
+      <div class="g2"><div class="fg"><label>Hauteur plateau (m)</label><input id="fr-c-deck" type="number" step="0.01" inputmode="decimal" oninput="fretSetCfg()"></div><div class="fg"><label>Hauteur max (m)</label><input id="fr-c-hmax" type="number" step="0.01" inputmode="decimal" oninput="fretSetCfg()"></div></div>
+      <div class="fg"><label>Largeur max (m)</label><input id="fr-c-wmax" type="number" step="0.01" inputmode="decimal" oninput="fretSetCfg()"></div>
+      <div style="font-size:12px;color:var(--grey);line-height:1.5">Vérifie la hauteur de plateau sur la fiche Kässbohrer : le contrôle hors gabarit en dépend.</div>
+    </div>
+  </div>
+</div>
+
 </div><!-- /content -->
 
 <nav id="nav">
@@ -658,6 +743,7 @@ tbody td{padding:10px 12px;vertical-align:middle}
   <div class="nb"     data-page="devis"   onclick="goPage('devis',this)">  <div class="nb-icon">📄</div><div class="nb-lbl">Devis</div></div>
   <div class="nb"     data-page="facture" onclick="goPage('facture',this)"><div class="nb-icon">🧾</div><div class="nb-lbl">Facture</div></div>
   <div class="nb"     data-page="it"      onclick="goPage('it',this)">      <div class="nb-icon">🚛</div><div class="nb-lbl">Trajet</div></div>
+  <div class="nb"     data-page="fret"    onclick="goPage('fret',this)">    <div class="nb-icon">🔎</div><div class="nb-lbl">Fret</div></div>
   <div class="nb"     data-page="crm"     onclick="goPage('crm',this)">     <div class="nb-icon">👥</div><div class="nb-lbl">CRM</div></div>
   <div class="nb"     data-page="pipe"    onclick="goPage('pipe',this)">    <div class="nb-icon">📊</div><div class="nb-lbl">Pipeline</div></div>
   <div class="nb"     data-page="ops"     onclick="goPage('ops',this)">     <div class="nb-icon">🛣️</div><div class="nb-lbl">Ops</div></div>
@@ -904,6 +990,7 @@ function goPage(page,el){
   if(page==='pipe') pipeRender();
   if(page==='ops') opsRenderAll();
   if(page==='neg') negRenderHist();
+  if(page==='fret') fretRenderOffers();
   if(page==='it') setTimeout(itOnShow,80);
 }
 function itOnShow(){
@@ -2541,6 +2628,7 @@ function dataImport(ev){
       prospects=load('prospects',[]); pipeline=load('pipeline',[]); trajets=load('trajets',[]);
       pleins=load('pleins',[]); maintenance=load('maintenance',[]); fuelPrices=load('fuelPrices',[]);
       drvTemps=load('drvTemps',[]); drvFrais=load('drvFrais',[]); negHist=load('negHist',[]); cmrDocs=load('cmr',[]);
+      fretOffers=load('fretOffers',[]); fretCfg=fretLoadCfg(); fretFillCfg();
       capLoad(); renderHome(); dataRenderInfo();
       showToast('Sauvegarde restaurée','ok');
     }catch(e){ showToast('Fichier invalide','err'); }
@@ -2616,6 +2704,187 @@ function indexToDevis(){
   showToast('Ajustement indexation appliqué au devis','ok');
 }
 
+/* ============================================================
+   FRET — recherche multi-bourses, évaluation, suivi des offres
+============================================================ */
+var FRET_PAYS=[['FR','France'],['LU','Luxembourg'],['BE','Belgique'],['NL','Pays-Bas'],['DE','Allemagne'],['DK','Danemark'],['SE','Suède'],['NO','Norvège'],['FI','Finlande'],['PL','Pologne'],['CZ','Tchéquie'],['AT','Autriche'],['CH','Suisse'],['IT','Italie'],['ES','Espagne'],['PT','Portugal']];
+var FRET_TYPES=[
+  {n:'Engins BTP / porte-engins',fil:'Engins BTP (pelleteuses, compacteurs)'},
+  {n:"Conteneur 20' / 40'",fil:'Conteneur maritime 20ft'},
+  {n:'Matériel industriel',fil:'Équipements industriels'},
+  {n:'Bois / grumes / sciages',fil:'Bois / Biomasse'},
+  {n:'Matériel agricole',fil:'Machines agricoles'},
+  {n:'Pierre naturelle / dallage',fil:'Granulats / Pierre'},
+  {n:'Autre plateau',fil:'Matériaux construction (acier, préfab)'}
+];
+var FRET_BOARDS=[
+  {n:'TIMOCOM',u:'https://www.timocom.fr',d:'Leader européen, fort DE, Benelux, PL. API pour abonnés.'},
+  {n:'Trans.eu',u:'https://platform.trans.eu',d:'Europe centrale et Est. API disponible.'},
+  {n:'Teleroute',u:'https://www.teleroute.com',d:'Benelux et France, bon pour les retours sud.'},
+  {n:'B2PWeb',u:'https://www.b2pweb.com',d:'Bourse française, intérieur et export.'},
+  {n:'Wtransnet',u:'https://www.wtransnet.com',d:'Espagne et Portugal, retours ibériques.'},
+  {n:'Cargopedia',u:'https://www.cargopedia.net',d:'Gratuite, complément Italie et Est.'}
+];
+var FRET_STATUS=['À appeler','En négo','Confirmé','Refusé'];
+var FRET_DEF={crk:1.37,tgt:1.65,vide:15,cu:36.5,len:13.6,deck:0.98,hmax:4.00,wmax:2.55};
+var FRET_EF=['from','to','date','board','type','w','l','wd','h','kc','kv','p','t','c'];
+var fretOffers=load('fretOffers',[]);
+var fretCfg=fretLoadCfg();
+var fretEditId=0;
+
+function fretLoadCfg(){ var c=load('fretCfg',{}),k,o={}; for(k in FRET_DEF){ o[k]=(c&&typeof c[k]==='number')?c[k]:FRET_DEF[k]; } return o; }
+function fretPlus(n){ var d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+function fretOpts(arr,fn){ var h='',i; for(i=0;i<arr.length;i++){ h+=fn(arr[i]); } return h; }
+
+function fretInit(){
+  if(!$('p-fret')) return;
+  var pays=fretOpts(FRET_PAYS,function(p){ return '<option value="'+p[0]+'">'+p[0]+' · '+p[1]+'</option>'; });
+  st('fr-s-fc',pays); st('fr-s-tc',pays); sv('fr-s-tc','ES');
+  var types=fretOpts(FRET_TYPES,function(t){ return '<option>'+esc(t.n)+'</option>'; });
+  st('fr-s-ty',types); st('fr-e-type',types);
+  st('fr-e-board',fretOpts(FRET_BOARDS,function(b){ return '<option>'+b.n+'</option>'; })+'<option>Direct client</option>');
+  st('fr-o-f','<option value="">Tous statuts</option>'+fretOpts(FRET_STATUS,function(s){ return '<option>'+s+'</option>'; }));
+  st('fr-boards',fretOpts(FRET_BOARDS,function(b){ return '<a class="fr-board" href="'+b.u+'" target="_blank" rel="noopener"><b>'+b.n+'</b><small>'+b.d+'</small><span>Ouvrir ↗</span></a>'; }));
+  if(!gv('fr-s-d')) sv('fr-s-d',fretPlus(1));
+  if(!gv('fr-e-date')) sv('fr-e-date',fretPlus(1));
+  sv('fr-s-w',fretCfg.cu);
+  fretFillCfg(); fretCrit(); fretEval();
+}
+
+function fretTab(t){
+  var tabs=['search','eval','offers','set'],i;
+  for(i=0;i<tabs.length;i++){
+    var pill=$('fret-tab-'+tabs[i]); if(pill) pill.className='tab-pill'+(tabs[i]===t?' on':'');
+    var pane=$('fret-'+tabs[i]); if(pane) pane.style.display=(tabs[i]===t?'block':'none');
+  }
+  if(t==='offers') fretRenderOffers();
+  var c=$('content'); if(c) c.scrollTop=0;
+}
+
+/* --- recherche --- */
+function fretCrit(){
+  var d=gv('fr-s-d');
+  var txt='Départ : '+gv('fr-s-fc')+' '+gv('fr-s-f')+' (rayon '+(gv('fr-s-r')||'0')+' km)\n'+
+    'Arrivée : '+gv('fr-s-tc')+' '+gv('fr-s-t')+'\n'+
+    'Date : '+(d?frDate(d):'flexible')+'\n'+
+    'Véhicule : semi plateau surbaissé '+num(fretCfg.len,1)+' m, verrous conteneur\n'+
+    'Marchandise : '+gv('fr-s-ty')+'\n'+
+    'Poids max : '+(gv('fr-s-w')||num(fretCfg.cu,1))+' t · Carburant HVO100';
+  var e=$('fr-crit'); if(e) e.textContent=txt;
+  return txt;
+}
+function fretCopy(txt,msg){
+  function fb(){
+    var ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); showToast(msg,'ok'); }catch(e){ showToast('Copie impossible','err'); }
+    document.body.removeChild(ta);
+  }
+  try{ navigator.clipboard.writeText(txt).then(function(){ showToast(msg,'ok'); },fb); }catch(e){ fb(); }
+}
+function fretCopyCrit(){ fretCopy(fretCrit(),'Critères copiés'); }
+
+/* --- calcul --- */
+function fretCalc(o){
+  var c=fretCfg, kc=+o.kc||0, kv=+o.kv||0, p=+o.p||0, t=+o.t||0, tot=kc+kv;
+  var cost=tot*c.crk+t, marge=p-cost, ekm=tot?(p-t)/tot:0, ekmC=kc?p/kc:0, pv=tot?kv/tot*100:0;
+  var flags=[], hard=false, ht=(+o.h||0)+c.deck;
+  if(+o.w>c.cu){ flags.push('Poids '+num(+o.w,1)+' t au-dessus de la charge utile ('+num(c.cu,1)+' t)'); hard=true; }
+  if(+o.l>c.len) flags.push('Longueur '+num(+o.l,1)+' m > plateau ('+num(c.len,2)+' m) : porte-à-faux à signaler');
+  if(+o.h>0&&ht>c.hmax) flags.push('Hauteur totale '+num(ht,2)+' m > '+num(c.hmax,2)+' m : transport exceptionnel');
+  if(+o.wd>c.wmax) flags.push('Largeur '+num(+o.wd,2)+' m > '+num(c.wmax,2)+' m : transport exceptionnel');
+  if(pv>c.vide) flags.push('Vide d\'approche '+num(pv,0)+' % (seuil '+num(c.vide,0)+' %)');
+  var cls=hard?'bad':(ekm>=c.tgt?'ok':(ekm>=c.crk?'warn':'bad'));
+  var v=hard?'Impossible':(cls==='ok'?'À prendre':(cls==='warn'?'À négocier':'Sous le coût de revient'));
+  return {tot:tot,cost:cost,marge:marge,ekm:ekm,ekmC:ekmC,flags:flags,cls:cls,v:v,pmin:Math.ceil((tot*c.tgt+t)/10)*10};
+}
+
+/* --- évaluer --- */
+function fretReadE(){ var o={},i; for(i=0;i<FRET_EF.length;i++){ o[FRET_EF[i]]=gv('fr-e-'+FRET_EF[i]); } return o; }
+function fretEval(){
+  var el=$('fr-res'); if(!el) return;
+  var o=fretReadE();
+  if(!(+o.kc>0)||!(+o.p>0)){ el.className='fr-res'; el.innerHTML='<span style="color:var(--grey);font-size:13px">Saisis le km chargé et le prix proposé pour obtenir le verdict.</span>'; return; }
+  var r=fretCalc(o),i,fl='';
+  for(i=0;i<r.flags.length;i++) fl+='<li>'+esc(r.flags[i])+'</li>';
+  el.className='fr-res '+r.cls;
+  el.innerHTML='<div class="fr-v">'+r.v+'</div><div class="fr-kv">'+
+    '<div><span>€/km total</span><strong>'+num(r.ekm,2)+'</strong></div>'+
+    '<div><span>€/km chargé</span><strong>'+num(r.ekmC,2)+'</strong></div>'+
+    '<div><span>Km total</span><strong>'+num(r.tot)+'</strong></div>'+
+    '<div><span>Coût estimé</span><strong>'+num(r.cost)+' €</strong></div>'+
+    '<div><span>Marge</span><strong>'+(r.marge>=0?'+':'')+num(r.marge)+' €</strong></div>'+
+    '<div><span>Prix cible</span><strong>'+num(r.pmin)+' €</strong></div></div>'+
+    (fl?'<ul class="fr-flags">'+fl+'</ul>':'');
+}
+function fretSave(){
+  var o=fretReadE();
+  if(!o.from.trim()||!o.to.trim()||!(+o.kc>0)||!(+o.p>0)){ showToast('Départ, arrivée, km chargé et prix requis','err'); return; }
+  var i;
+  if(fretEditId){
+    for(i=0;i<fretOffers.length;i++){ if(fretOffers[i].id===fretEditId){ o.id=fretEditId; o.st=fretOffers[i].st; o.pipe=fretOffers[i].pipe; fretOffers[i]=o; } }
+    showToast('Offre mise à jour','ok');
+  } else { o.id=uid(); o.st='À appeler'; fretOffers.push(o); showToast('Offre ajoutée','ok'); }
+  save('fretOffers',fretOffers); fretResetEval(); fretTab('offers');
+}
+function fretResetEval(){
+  var i; for(i=0;i<FRET_EF.length;i++){ var k=FRET_EF[i]; if(k!=='board'&&k!=='type') sv('fr-e-'+k,''); }
+  sv('fr-e-date',fretPlus(1)); fretEditId=0; st('fr-e-save','💾 Ajouter à mes offres'); fretEval();
+}
+
+/* --- offres --- */
+function fretFind(id){ var i; for(i=0;i<fretOffers.length;i++){ if(fretOffers[i].id===id) return fretOffers[i]; } return null; }
+function fretRenderOffers(){
+  if(!$('fr-list')) return;
+  var f=gv('fr-o-f'), cnt={}, i, list=[], h='';
+  for(i=0;i<FRET_STATUS.length;i++) cnt[FRET_STATUS[i]]=0;
+  var conf=0, margeConf=0;
+  for(i=0;i<fretOffers.length;i++){ var o=fretOffers[i]; cnt[o.st]=(cnt[o.st]||0)+1; if(o.st==='Confirmé'){ conf+=(+o.p||0); margeConf+=fretCalc(o).marge; } if(!f||o.st===f) list.push(o); }
+  st('fr-kpis','<div class="kpi"><div class="kpi-v">'+(cnt['À appeler']||0)+'</div><div class="kpi-l">À appeler</div></div>'+
+    '<div class="kpi"><div class="kpi-v">'+(cnt['En négo']||0)+'</div><div class="kpi-l">En négo</div></div>'+
+    '<div class="kpi"><div class="kpi-v">'+num(conf)+' €</div><div class="kpi-l">Confirmé</div></div>'+
+    '<div class="kpi"><div class="kpi-v">'+(margeConf>=0?'+':'')+num(margeConf)+' €</div><div class="kpi-l">Marge confirmée</div></div>');
+  list.sort(function(a,b){ return String(a.date||'').localeCompare(String(b.date||'')); });
+  if(!list.length){ st('fr-list','<div class="fr-empty">Aucune offre'+(f?' « '+esc(f)+' »':'')+'. Évalue une offre trouvée en bourse puis ajoute-la ici.</div>'); return; }
+  for(i=0;i<list.length;i++){
+    var x=list[i], r=fretCalc(x), opts='', j;
+    for(j=0;j<FRET_STATUS.length;j++) opts+='<option'+(FRET_STATUS[j]===x.st?' selected':'')+'>'+FRET_STATUS[j]+'</option>';
+    h+='<div class="fr-offer '+r.cls+'"><div class="fr-lane">'+esc(x.from)+' → '+esc(x.to)+'</div>'+
+      '<div class="fr-meta">'+(x.date?frDate(x.date)+' · ':'')+esc(x.board)+' · '+esc(x.type)+(x.w?' · '+num(+x.w,1)+' t':'')+(x.c?' · '+esc(x.c):'')+'</div>'+
+      '<div class="fr-nums"><span>'+num(+x.p)+' €</span><span>'+num(r.ekm,2)+' €/km</span><span>'+num(r.tot)+' km</span><span style="color:'+(r.marge>=0?'var(--green)':'var(--red)')+'">'+(r.marge>=0?'+':'')+num(r.marge)+' €</span></div>'+
+      '<div class="fr-meta" style="margin-bottom:8px">'+r.v+(r.flags.length?' · '+r.flags.length+' alerte'+(r.flags.length>1?'s':''):'')+(x.pipe?' · dans le Pipeline':'')+'</div>'+
+      '<div class="fr-act"><select aria-label="Statut" onchange="fretSetStatus('+x.id+',this.value)">'+opts+'</select>'+
+      '<button class="btn bgy" onclick="fretEdit('+x.id+')">✏️ Ouvrir</button>'+
+      (x.pipe?'':'<button class="btn bn" onclick="fretToPipe('+x.id+')">📊 Pipeline</button>')+
+      '<button class="btn br" onclick="fretDelete('+x.id+')">🗑</button></div></div>';
+  }
+  st('fr-list',h);
+}
+function fretSetStatus(id,s){ var o=fretFind(id); if(!o) return; o.st=s; save('fretOffers',fretOffers); fretRenderOffers(); }
+function fretEdit(id){
+  var o=fretFind(id); if(!o) return; var i;
+  for(i=0;i<FRET_EF.length;i++){ var k=FRET_EF[i]; sv('fr-e-'+k,o[k]==null?'':o[k]); }
+  fretEditId=id; st('fr-e-save','💾 Enregistrer'); fretEval(); fretTab('eval');
+}
+function fretDelete(id){
+  if(!confirm('Supprimer cette offre ?')) return;
+  fretOffers=fretOffers.filter(function(o){ return o.id!==id; }); save('fretOffers',fretOffers); fretRenderOffers(); showToast('Offre supprimée','ok');
+}
+function fretToPipe(id){
+  var o=fretFind(id); if(!o) return; var fil='Engins BTP (pelleteuses, compacteurs)', i;
+  for(i=0;i<FRET_TYPES.length;i++){ if(FRET_TYPES[i].n===o.type) fil=FRET_TYPES[i].fil; }
+  var stat=o.st==='Confirmé'?'Client':'Négociation';
+  pipeline.push({id:uid(),client:o.c||('Bourse '+o.board),fil:fil,stat:stat,dep:o.from,arr:o.to,km:(+o.kc||0)+(+o.kv||0),ht:+o.p||0,notes:'Fret '+o.board+(o.date?' · '+frDate(o.date):'')});
+  save('pipeline',pipeline); o.pipe=1; save('fretOffers',fretOffers); fretRenderOffers(); showToast('Ajoutée au Pipeline','ok');
+}
+
+/* --- réglages --- */
+function fretFillCfg(){ var k; for(k in FRET_DEF){ if($('fr-c-'+k)) sv('fr-c-'+k,fretCfg[k]); } }
+function fretSetCfg(){
+  var k; for(k in FRET_DEF){ var v=parseFloat(gv('fr-c-'+k)); if(!isNaN(v)) fretCfg[k]=v; }
+  save('fretCfg',fretCfg); fretCrit(); fretEval();
+}
+
 function init(){
   // date entête
   try{ st('hdate',new Date().toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})); }catch(e){ st('hdate',todayISO()); }
@@ -2650,6 +2919,7 @@ function init(){
   if($('fv-grp-eqv')&&!gv('fv-grp-eqv')) sv('fv-grp-eqv',grpEqvDef);
   sv('dv-grp-eqv',grpEqvDef); sv('fv-grp-eqv',grpEqvDef);
   baremeRender();
+  fretInit();
   renderHome();
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
