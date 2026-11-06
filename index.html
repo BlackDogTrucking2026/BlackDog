@@ -494,9 +494,21 @@ tbody td{padding:10px 12px;vertical-align:middle}
   </div>
   <div class="card">
     <div class="card-ttl">⚙️ Paramètres PL</div>
-    <div class="g2"><div class="fg"><label>Poids total (t)</label><input id="it-poids" type="number" value="40" inputmode="decimal"></div><div class="fg"><label>Hauteur (m)</label><input id="it-haut" type="number" value="4.0" step="0.1" inputmode="decimal"></div><div class="fg"><label>Largeur (m)</label><input id="it-larg" type="number" value="2.55" step="0.05" inputmode="decimal"></div><div class="fg"><label>Longueur (m)</label><input id="it-long" type="number" value="16.5" step="0.5" inputmode="decimal"></div></div>
-    <div class="sc-list" style="margin-top:8px"><label class="sc-item"><input type="checkbox" id="it-tunnel"><div><div style="font-weight:600">Éviter tunnels</div></div></label><label class="sc-item"><input type="checkbox" id="it-ferry"><div><div style="font-weight:600">Éviter ferrys</div></div></label><label class="sc-item"><input type="checkbox" id="it-peage"><div><div style="font-weight:600">Éviter péages</div></div></label></div>
+    <div style="font-size:12px;color:var(--grey);margin-bottom:10px;line-height:1.5">Profil mémorisé de l'ensemble. Ajustez la charge du jour : poids total et hauteur se recalculent.</div>
+    <div class="g2"><div class="fg"><label>Tare ensemble (t)</label><input id="it-tare" type="number" step="0.1" inputmode="decimal" oninput="itProfilCalc()"></div><div class="fg"><label>Charge du jour (t)</label><input id="it-charge" type="number" step="0.1" inputmode="decimal" placeholder="0" oninput="itProfilCalc()"></div></div>
+    <div class="g2"><div class="fg"><label>Hauteur cabine (m)</label><input id="it-hcab" type="number" step="0.05" inputmode="decimal" oninput="itProfilCalc()"></div><div class="fg"><label>Hauteur plateau (m)</label><input id="it-hplat" type="number" step="0.01" inputmode="decimal" oninput="itProfilCalc()"></div></div>
+    <div class="fg"><label>Hauteur de la charge sur plateau (m)</label><input id="it-hcharge" type="number" step="0.05" inputmode="decimal" placeholder="Ex : 3,10 pour une pelle" oninput="itProfilCalc()"></div>
+    <div class="g2"><div class="fg"><label>Poids total (t)</label><input id="it-poids" type="number" step="0.1" inputmode="decimal"></div><div class="fg"><label>Hauteur totale (m)</label><input id="it-haut" type="number" step="0.05" inputmode="decimal"></div><div class="fg"><label>Largeur (m)</label><input id="it-larg" type="number" step="0.05" inputmode="decimal"></div><div class="fg"><label>Longueur (m)</label><input id="it-long" type="number" step="0.1" inputmode="decimal"></div></div>
+    <div class="fg"><label>Charge à l'essieu max (t)</label><input id="it-essieu" type="number" step="0.1" inputmode="decimal"></div>
+    <div class="sc-list" style="margin-top:8px"><label class="sc-item"><input type="checkbox" id="it-adr"><div><div style="font-weight:600">Marchandises dangereuses (ADR)</div><div style="font-size:11px;color:var(--grey)">Évite les tunnels et routes interdits aux matières dangereuses</div></div></label><label class="sc-item"><input type="checkbox" id="it-ferry"><div><div style="font-weight:600">Éviter ferrys</div></div></label><label class="sc-item"><input type="checkbox" id="it-peage"><div><div style="font-weight:600">Éviter péages</div></div></label></div>
     <div id="it-restr-warn"></div>
+    <div class="brow" style="margin-top:8px"><button class="btn bgy btn-sm" onclick="itProfilSave()">💾 Mémoriser ce profil</button><button class="btn bgy btn-sm" onclick="itProfilDefault()">↺ Valeurs d'usine</button></div>
+  </div>
+  <div class="card">
+    <div class="card-ttl">🔑 Routage poids lourd</div>
+    <div style="font-size:12px;color:var(--grey);margin-bottom:10px;line-height:1.5">Avec une clé openrouteservice (gratuite, environ 2 000 calculs par jour), l'itinéraire respecte le gabarit ci-dessus : ponts bas, limites de tonnage, routes interdites aux PL. Sans clé, l'appli utilise un itinéraire voiture indicatif. Créer une clé : <a href="https://account.heigit.org/signup" target="_blank" rel="noopener" style="color:var(--gold,#C8A84B)">account.heigit.org</a></div>
+    <div class="fg"><label>Clé API openrouteservice</label><div style="display:flex;gap:8px"><input id="it-orskey" type="password" autocomplete="off" placeholder="Collez votre clé ici" style="flex:1"><button class="btn bgy btn-sm" onclick="itOrsKeySave()" style="flex:0 0 auto">💾</button></div></div>
+    <div id="it-orskey-st" style="font-size:12px;color:var(--grey)"></div>
   </div>
   <div class="brow"><button class="btn bn" id="it-btn-calc" onclick="itCalc()">🗺️ Calculer</button><button class="btn bgy btn-sm" onclick="itReset()" style="flex:0 0 auto">🔄</button></div>
   <div class="brow" style="margin-top:8px">
@@ -994,6 +1006,7 @@ function goPage(page,el){
   if(page==='it') setTimeout(itOnShow,80);
 }
 function itOnShow(){
+  itProfilInit();
   itEnsureMap();
   if(itMap){ try{ itMap.invalidateSize(); }catch(e){} }
 }
@@ -2429,7 +2442,83 @@ function itEnsureMap(){
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(itMap);
   setTimeout(function(){ try{ itMap.invalidateSize(); }catch(e){} },120);
 }
+/* ---------- Profil PL & routage openrouteservice (driving-hgv) ---------- */
+var IT_PROFIL_DEF={tare:16.0,hcab:4.0,hplat:0.98,larg:2.55,long:16.5,essieu:11.5};
+var IT_ORS_URL='https://api.heigit.org/openrouteservice/v2/directions/driving-hgv/geojson';
+var itProfilDone=false;
+function itProfilLoad(){ var p=load('itProfil',{}),k,o={}; for(k in IT_PROFIL_DEF){ o[k]=(p&&typeof p[k]==='number')?p[k]:IT_PROFIL_DEF[k]; } return o; }
+function itProfilFill(p){
+  sv('it-tare',p.tare); sv('it-hcab',p.hcab); sv('it-hplat',p.hplat);
+  sv('it-larg',p.larg); sv('it-long',p.long); sv('it-essieu',p.essieu);
+  itProfilCalc();
+}
+function itProfilInit(){
+  if(itProfilDone) return; itProfilDone=true;
+  itProfilFill(itProfilLoad());
+  sv('it-orskey',load('orsKey',''));
+  itOrsKeyStatus();
+}
+function itProfilCalc(){
+  var tare=gn('it-tare'), charge=gn('it-charge');
+  sv('it-poids',Math.round((tare+charge)*10)/10);
+  var hcab=gn('it-hcab'), hplat=gn('it-hplat'), hch=gn('it-hcharge');
+  var h=Math.max(hcab, hch>0?(hplat+hch):0);
+  sv('it-haut',Math.round(h*100)/100);
+  var w='';
+  if(h>4.0) w+='⚠️ Hauteur '+num(h,2)+' m : au-dessus de 4,00 m, vérifier les gabarits pays (transport exceptionnel possible). ';
+  if(gn('it-larg')>2.55) w+='⚠️ Largeur hors gabarit standard UE (2,55 m) : autorisation de transport exceptionnel. ';
+  if(tare+charge>40) w+='⚠️ Poids total au-dessus de 40 t. ';
+  st('it-restr-warn',w?'<div style="font-size:12px;color:#E8A33D;margin-top:8px;line-height:1.5">'+w+'</div>':'');
+}
+function itProfilSave(){
+  var o={tare:gn('it-tare'),hcab:gn('it-hcab'),hplat:gn('it-hplat'),larg:gn('it-larg'),long:gn('it-long'),essieu:gn('it-essieu')};
+  save('itProfil',o); showToast('Profil PL mémorisé','ok');
+}
+function itProfilDefault(){ itProfilFill(IT_PROFIL_DEF); showToast('Valeurs d\'usine (non mémorisées)'); }
+function itOrsKeySave(){ var k=(gv('it-orskey')||'').trim(); save('orsKey',k); itOrsKeyStatus(); showToast(k?'Clé enregistrée':'Clé effacée','ok'); }
+function itOrsKeyStatus(){ var k=load('orsKey',''); st('it-orskey-st',k?'✅ Clé enregistrée : calcul poids lourd actif.':'Aucune clé : itinéraire voiture indicatif.'); }
+
+function itOrsRoute(pts,key){
+  var restr={length:gn('it-long'),width:gn('it-larg'),height:gn('it-haut'),weight:gn('it-poids'),axleload:gn('it-essieu')};
+  var k; for(k in restr){ if(!(restr[k]>0)) delete restr[k]; }
+  if($('it-adr')&&$('it-adr').checked) restr.hazmat=true;
+  var avoid=[]; if($('it-peage')&&$('it-peage').checked) avoid.push('tollways'); if($('it-ferry')&&$('it-ferry').checked) avoid.push('ferries');
+  var opts={vehicle_type:'hgv',profile_params:{restrictions:restr}}; if(avoid.length) opts.avoid_features=avoid;
+  var body={coordinates:pts.map(function(p){ return [p.lon,p.lat]; }),instructions:true,language:'fr',options:opts};
+  var ctl=null; try{ ctl=new AbortController(); }catch(e){}
+  var timer=setTimeout(function(){ if(ctl) ctl.abort(); },20000);
+  return fetch(IT_ORS_URL,{method:'POST',headers:{'Authorization':key,'Content-Type':'application/json','Accept':'application/geo+json, application/json'},body:JSON.stringify(body),signal:ctl?ctl.signal:undefined})
+  .then(function(r){ clearTimeout(timer);
+    return r.json().catch(function(){ return {}; }).then(function(j){
+      if(!r.ok){ var e=new Error('ors'); e.status=r.status; e.code=(j&&j.error&&j.error.code)||0; e.msg=(j&&j.error&&(j.error.message||j.error))||''; throw e; }
+      var f=j&&j.features&&j.features[0]; if(!f) { var e2=new Error('ors'); e2.status=0; throw e2; }
+      var sm=f.properties.summary||{}, segs=f.properties.segments||[], steps=[],a,b;
+      for(a=0;a<segs.length;a++){ var ss=segs[a].steps||[]; for(b=0;b<ss.length;b++){ steps.push({icon:orsIcon(ss[b].type),text:ss[b].instruction||'',dist:ss[b].distance||0}); } }
+      return {src:'ors',distance:sm.distance||0,duration:sm.duration||0,coords:f.geometry.coordinates,steps:steps};
+    });
+  }, function(err){ clearTimeout(timer); var e=new Error('ors'); e.status=-1; throw e; });
+}
+function orsIcon(t){ var m={0:'⬅️',1:'➡️',2:'⬅️',3:'➡️',4:'↖️',5:'↗️',6:'⬆️',7:'🔄',8:'🔄',9:'↩️',10:'🔴',11:'🟢',12:'↖️',13:'↗️'}; return m[t]||'⬆️'; }
+function orsErrText(e){
+  if(e.status===401||e.status===403) return 'Clé openrouteservice refusée ou quota du jour atteint';
+  if(e.status===429) return 'Trop de calculs à la minute, réessayez dans un instant';
+  if(e.code===2004) return 'Trajet trop long ou trop d\'étapes pour le service';
+  if(e.code===2009||e.code===2010) return 'Aucun itinéraire PL trouvé avec ce gabarit (point hors route ou zone inaccessible)';
+  if(e.status===-1) return 'Service PL injoignable';
+  return 'Erreur du service PL'+(e.msg?(' : '+e.msg):'');
+}
+function itOsrmRoute(pts){
+  var coords=pts.map(function(p){ return p.lon+','+p.lat; }).join(';');
+  var url='https://router.project-osrm.org/route/v1/driving/'+coords+'?overview=full&geometries=geojson&steps=true';
+  return fetchTimeout(url,9000).then(function(r){ return r.json(); }).then(function(j){
+    if(!j.routes||!j.routes.length) throw new Error('noroute');
+    var rt=j.routes[0], steps=[],a,b;
+    for(a=0;a<rt.legs.length;a++){ var lg=rt.legs[a]; for(b=0;b<lg.steps.length;b++){ var sp=lg.steps[b]; steps.push({icon:stepIcon(sp.maneuver),text:maneuverText(sp.maneuver,sp.name||''),dist:sp.distance}); } }
+    return {src:'osrm',distance:rt.distance,duration:rt.duration,coords:rt.geometry.coordinates,steps:steps};
+  });
+}
 function itCalc(){
+  itProfilInit();
   var dep=gv('it-dep'), arr=gv('it-arr');
   if(!dep||!arr){ showToast('Départ et arrivée requis','err'); return; }
   var etapeInputs=document.querySelectorAll('#it-etapes input');
@@ -2437,6 +2526,7 @@ function itCalc(){
   showToast('Calcul de l\'itinéraire…');
   var btn=$('it-btn-calc'); var done=function(){ if(btn) btn.textContent='🗺️ Calculer'; };
   if(btn) btn.textContent='⏳ Calcul…';
+  var key=(load('orsKey','')||'').trim();
   Promise.all(seq.map(itParsePoint)).then(function(pts){
     var fails=[], neterr=false, k;
     for(k=0;k<pts.length;k++){ if(!pts[k]||pts[k].__fail){ fails.push(seq[k]); if(pts[k]&&pts[k].neterr) neterr=true; } }
@@ -2445,41 +2535,48 @@ function itCalc(){
       else { showToast('Adresse introuvable : '+fails.join(' / ')+'. Essayez « Ville, Pays » ou « lat,lon ».','err'); }
       done(); return;
     }
-    var coords=pts.map(function(p){ return p.lon+','+p.lat; }).join(';');
-    var url='https://router.project-osrm.org/route/v1/driving/'+coords+'?overview=full&geometries=geojson&steps=true';
-    fetchTimeout(url,9000).then(function(r){ return r.json(); }).then(function(j){
-      if(!j.routes||!j.routes.length) throw new Error('noroute');
-      itShowResult(j.routes[0].distance/1000,pts,j.routes[0],false); done();
-      showToast('Itinéraire calculé','ok');
-    }).catch(function(){
-      // repli : routage indisponible -> estimation à vol d'oiseau
-      itShowResult(itEstimateKm(pts),pts,null,true); done();
-      showToast('Routage indisponible — estimation affichée','err');
+    var fallback=function(why){
+      return itOsrmRoute(pts).then(function(rt){ itShowResult(rt.distance/1000,pts,rt,false,why); done(); showToast(why?(why+' — itinéraire voiture affiché'):'Itinéraire calculé',why?'err':'ok'); })
+      .catch(function(){ itShowResult(itEstimateKm(pts),pts,null,true,why); done(); showToast('Routage indisponible — estimation affichée','err'); });
+    };
+    if(!key){ fallback(''); return; }
+    itOrsRoute(pts,key).then(function(rt){ itShowResult(rt.distance/1000,pts,rt,false,''); done(); showToast('Itinéraire poids lourd calculé','ok'); })
+    .catch(function(e){
+      // Aucun itinéraire PL avec ce gabarit : on ne bascule PAS en voiture, ce serait trompeur
+      if(e.code===2009||e.code===2010){ done(); $('it-results').style.display='none'; showToast(orsErrText(e),'err'); return; }
+      fallback(orsErrText(e));
     });
   }).catch(function(){
     showToast('Réseau indisponible. Saisissez la distance directement dans l\'onglet Devis.','err'); done();
   });
 }
-function itShowResult(km,pts,route,approx){
-  var durPL=route?(route.duration/3600*1.25+(km>500?1:0.5)):(km/68+(km>500?1.5:0.75));
-  var lit=km*0.30;
+function itShowResult(km,pts,route,approx,why){
+  var durPL, info;
   var prixHvo=fuelPrices.length?(+fuelPrices[fuelPrices.length-1].hvo||1.35):1.35;
-  var cout=lit*prixHvo;
-  itLastResult={km:km,durPL:durPL,lit:lit,cout:cout,dep:pts[0],arr:pts[pts.length-1],pts:pts};
+  var fuelTxt='HVO100 ~30 L/100km @ '+num(prixHvo,3)+' €/L';
+  if(route&&route.src==='ors'){
+    var hc=route.duration/3600;
+    durPL=hc+Math.floor(hc/4.5)*0.75;
+    info='✅ Itinéraire poids lourd (openrouteservice) · gabarit '+num(gn('it-haut'),2)+' m × '+num(gn('it-larg'),2)+' m × '+num(gn('it-long'),1)+' m · '+num(gn('it-poids'),1)+' t'+(($('it-adr')&&$('it-adr').checked)?' · ADR':'')+'. Durée = conduite PL + pauses 45 min toutes les 4 h 30 (repos journalier non inclus). '+fuelTxt+'.';
+  } else if(route){
+    durPL=route.duration/3600*1.25+(km>500?1:0.5);
+    info=(why?('⚠️ '+why+'. '):'')+'Itinéraire voiture indicatif (OSRM), sans contrôle du gabarit PL : vérifier ponts bas et restrictions. Estimation PL ×1,25 + pauses. '+fuelTxt+'.'+(!load('orsKey','')?' Ajoutez une clé openrouteservice pour un calcul poids lourd.':'');
+  } else {
+    durPL=km/68+(km>500?1.5:0.75);
+    info='⚠️ Estimation à vol d\'oiseau ×1,3 (serveurs de routage indisponibles). '+fuelTxt+'. Lancez Sygic GPS Camion pour l\'itinéraire réel.';
+  }
+  var lit=km*0.30, cout=lit*prixHvo;
+  itLastResult={km:km,durPL:durPL,lit:lit,cout:cout,dep:pts[0],arr:pts[pts.length-1],pts:pts,src:route?route.src:'est'};
   st('it-r-dist',num(km,0)+' km'); st('it-r-dur',num(durPL,1)+' h');
   st('it-r-lit',num(lit,0)+' L'); st('it-r-cout',num(cout,0)+' €');
-  st('it-r-info', approx
-    ? '⚠️ Estimation à vol d\'oiseau ×1,3 (serveur de routage OSRM indisponible). HVO100 ~30 L/100km @ '+num(prixHvo,3)+' €/L. Lancez Sygic GPS Camion pour l\'itinéraire réel.'
-    : 'Estimation PL (×1,25 + pauses) · HVO100 ~30 L/100km @ '+num(prixHvo,3)+' €/L. Itinéraire indicatif (profil OSRM voiture) — vérifier restrictions PL.');
-  if(route){
-    var steps=[],s;
-    for(s=0;s<route.legs.length;s++){ var leg=route.legs[s]; var st2;
-      for(st2=0;st2<leg.steps.length&&steps.length<40;st2++){ var step=leg.steps[st2];
-        var name=step.name||''; var d=step.distance;
-        steps.push('<div class="it-instr"><div class="it-icon">'+stepIcon(step.maneuver)+'</div><div style="flex:1">'+esc(maneuverText(step.maneuver,name))+'</div><div class="it-dist">'+(d>1000?num(d/1000,1)+' km':num(d,0)+' m')+'</div></div>');
-      }
-    }
-    st('it-instrs',steps.join('')||'<div style="font-size:12px;color:var(--grey)">Détail non disponible.</div>');
+  st('it-r-info',info);
+  if(route&&route.steps.length){
+    var h=[],s;
+    for(s=0;s<route.steps.length&&h.length<80;s++){ var sp=route.steps[s]; var d=sp.dist;
+      h.push('<div class="it-instr"><div class="it-icon">'+sp.icon+'</div><div style="flex:1">'+esc(sp.text)+'</div><div class="it-dist">'+(d>1000?num(d/1000,1)+' km':num(d,0)+' m')+'</div></div>'); }
+    st('it-instrs',h.join(''));
+  } else if(route){
+    st('it-instrs','<div style="font-size:12px;color:var(--grey)">Détail non disponible.</div>');
   } else {
     st('it-instrs','<div style="font-size:12px;color:var(--grey)">Détail virage-par-virage indisponible en mode estimation. Utilisez Sygic / Waze / Plans pour la navigation réelle.</div>');
   }
@@ -2488,10 +2585,10 @@ function itShowResult(km,pts,route,approx){
     try{
       if(itLayer) itMap.removeLayer(itLayer);
       itLayer=L.layerGroup();
-      var latlngs=(route&&route.geometry&&route.geometry.coordinates)
-        ? route.geometry.coordinates.map(function(c){ return [c[1],c[0]]; })
+      var latlngs=(route&&route.coords)
+        ? route.coords.map(function(c){ return [c[1],c[0]]; })
         : pts.map(function(p){ return [p.lat,p.lon]; });
-      L.polyline(latlngs,{color:'#C8A84B',weight:5,dashArray:route?null:'8,8'}).addTo(itLayer);
+      L.polyline(latlngs,{color:(route&&route.src==='ors')?'#C8A84B':'#8A8F98',weight:5,dashArray:(route&&route.src==='ors')?null:'8,8'}).addTo(itLayer);
       L.marker([pts[0].lat,pts[0].lon]).addTo(itLayer).bindPopup('Départ');
       L.marker([pts[pts.length-1].lat,pts[pts.length-1].lon]).addTo(itLayer).bindPopup('Arrivée');
       itLayer.addTo(itMap);
@@ -2518,7 +2615,7 @@ function itOpenNav(app){
   else { url='http://maps.apple.com/?saddr='+d.lat+','+d.lon+'&daddr='+a.lat+','+a.lon+'&dirflg=d'; }
   window.location.href=url;
 }
-function itSygic(){ var box=$('it-sygic-info'); if(box){ box.style.display='block'; box.innerHTML='🧭 Ouverture Sygic GPS Camion — gabarit '+gv('it-haut')+'m / '+gv('it-poids')+'t. Si l\'app ne s\'ouvre pas, vérifier l\'installation.'; } itOpenNav('sygic'); }
+function itSygic(){ var box=$('it-sygic-info'); if(box){ box.style.display='block'; box.innerHTML='🧭 Ouverture Sygic GPS Camion — pensez à régler le gabarit dans Sygic : '+gv('it-haut')+' m / '+gv('it-poids')+' t. Si l\'app ne s\'ouvre pas, vérifier l\'installation.'; } itOpenNav('sygic'); }
 function itWazeResult(){ itOpenNav('waze'); }
 function itAppleMapsResult(){ itOpenNav('maps'); }
 function itSygicDirect(){
