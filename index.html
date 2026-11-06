@@ -527,6 +527,8 @@ tbody td{padding:10px 12px;vertical-align:middle}
       <button class="btn bn" onclick="itToFacture()" style="font-size:13px">🧾 Facture</button>
     </div>
     <div id="it-sygic-info" style="display:none;margin-top:8px;background:var(--navy);border-radius:10px;padding:12px;font-size:12px;color:var(--grey)"></div>
+    <div style="margin-top:8px;font-size:12px"><a href="#" onclick="itSygicDiag();return false;" style="color:var(--grey)">🔧 Sygic ne s'ouvre pas ? Tester les formats de lien</a></div>
+    <div id="it-sygic-diag" style="display:none;margin-top:8px;background:var(--navy);border-radius:10px;padding:12px;font-size:12px;color:var(--grey);line-height:1.6"></div>
     <div class="card" style="margin-top:12px"><div class="card-ttl">📋 Instructions</div><div id="it-instrs" style="max-height:220px;overflow-y:auto"></div></div>
   </div>
 </div>
@@ -2606,27 +2608,60 @@ function maneuverText(m,name){ var mod=m&&m.modifier?m.modifier:''; var t=m&&m.t
   var modFr={'left':'à gauche','right':'à droite','slight left':'légèrement à gauche','slight right':'légèrement à droite','sharp left':'franchement à gauche','sharp right':'franchement à droite','straight':'tout droit','uturn':'demi-tour'};
   return (fr[t]||'Continuer')+(modFr[mod]?(' '+modFr[mod]):'')+(name?(' sur '+name):''); }
 
+/* ---------- Ouverture GPS (Sygic : lancement synchrone, sinon iOS bloque) ---------- */
+var IT_SYG_VARIANTS={
+  A:'Coordonnées, séparateurs encodés',
+  B:'Coordonnées, séparateurs bruts',
+  C:'Recherche par adresse',
+  D:'Coordonnées + gabarit du camion'
+};
+function itSygicTruckParams(){
+  var p=[];
+  if(gn('it-poids')>0) p.push('wei='+Math.round(gn('it-poids')*1000));
+  if(gn('it-essieu')>0) p.push('axw='+Math.round(gn('it-essieu')*1000));
+  if(gn('it-long')>0) p.push('len='+Math.round(gn('it-long')*1000));
+  if(gn('it-larg')>0) p.push('wid='+Math.round(gn('it-larg')*1000));
+  if(gn('it-haut')>0) p.push('hei='+Math.round(gn('it-haut')*1000));
+  p.push('rou=tru');
+  return p.join('&');
+}
+function itSygicUrl(v){
+  var arrTxt=gv('it-arr'), a=itLastResult&&itLastResult.arr;
+  var enc=function(u){ return u.replace(/\|/g,'%7C'); };
+  if(v==='C'||!a){ return 'com.sygic.aura://'+enc('search|'+encodeURIComponent(arrTxt)+'|drive'); }
+  var coord='coordinate|'+a.lon.toFixed(6)+'|'+a.lat.toFixed(6)+'|drive';
+  if(v==='B') return 'com.sygic.aura://'+coord;
+  if(v==='D') return 'com.sygic.aura://'+enc('truckSettings|'+itSygicTruckParams())+'&&&'+enc(coord);
+  return 'com.sygic.aura://'+enc(coord);
+}
+function itSygicGo(v){
+  // Appelé directement par le clic : aucune attente réseau avant l'ouverture
+  v=v||load('sygicVariant','A');
+  if(!gv('it-arr')&&!(itLastResult&&itLastResult.arr)){ showToast('Saisissez une arrivée','err'); return; }
+  window.location.href=itSygicUrl(v);
+}
+function itSygicDiag(){
+  var box=$('it-sygic-diag'); if(!box) return;
+  if(box.style.display==='block'){ box.style.display='none'; return; }
+  var cur=load('sygicVariant','A'), h='Touchez chaque format. Quand Sygic s\'ouvre avec la bonne destination, touchez « ✅ Garder » : les boutons Sygic l\'utiliseront ensuite.<br>',k;
+  for(k in IT_SYG_VARIANTS){
+    h+='<div style="display:flex;gap:6px;align-items:center;margin-top:6px"><a class="btn bgy btn-sm" style="flex:1;text-decoration:none;text-align:left" href="'+esc(itSygicUrl(k))+'">'+k+' · '+IT_SYG_VARIANTS[k]+(k===cur?' (actuel)':'')+'</a><button class="btn bn btn-sm" style="flex:0 0 auto" onclick="save(\'sygicVariant\',\''+k+'\');showToast(\'Format '+k+' gardé\',\'ok\');$(\'it-sygic-diag\').style.display=\'none\'">✅ Garder</button></div>';
+  }
+  h+='<div style="margin-top:8px">Si aucun ne s\'ouvre : vérifiez que l\'appli Sygic GPS Camion est installée et ouverte au moins une fois.</div>';
+  box.innerHTML=h; box.style.display='block';
+}
 function itOpenNav(app){
   if(!itLastResult){ showToast('Calculez d\'abord','err'); return; }
-  var a=itLastResult.arr; var d=itLastResult.dep;
-  var url;
-  if(app==='sygic'){ url='com.sygic.aura://coordinate|'+a.lon+'|'+a.lat+'|drive'; }
-  else if(app==='waze'){ url='https://waze.com/ul?ll='+a.lat+','+a.lon+'&navigate=yes'; }
+  if(app==='sygic'){ itSygicGo(); return; }
+  var a=itLastResult.arr; var d=itLastResult.dep; var url;
+  if(app==='waze'){ url='https://waze.com/ul?ll='+a.lat+','+a.lon+'&navigate=yes'; }
   else { url='http://maps.apple.com/?saddr='+d.lat+','+d.lon+'&daddr='+a.lat+','+a.lon+'&dirflg=d'; }
   window.location.href=url;
 }
-function itSygic(){ var box=$('it-sygic-info'); if(box){ box.style.display='block'; box.innerHTML='🧭 Ouverture Sygic GPS Camion — pensez à régler le gabarit dans Sygic : '+gv('it-haut')+' m / '+gv('it-poids')+' t. Si l\'app ne s\'ouvre pas, vérifier l\'installation.'; } itOpenNav('sygic'); }
+function itSygic(){ var box=$('it-sygic-info'); if(box){ box.style.display='block'; box.innerHTML='🧭 Ouverture de Sygic GPS Camion. Vérifiez le gabarit dans Sygic : '+gv('it-haut')+' m / '+gv('it-poids')+' t.'; } itSygicGo(); }
 function itWazeResult(){ itOpenNav('waze'); }
 function itAppleMapsResult(){ itOpenNav('maps'); }
-function itSygicDirect(){
-  var arr=gv('it-arr'); if(!arr){ showToast('Saisissez une arrivée','err'); return; }
-  if(itLastResult&&itLastResult.arr){ window.location.href='com.sygic.aura://coordinate|'+itLastResult.arr.lon+'|'+itLastResult.arr.lat+'|drive'; return; }
-  showToast('Localisation de l\'arrivée…');
-  itParsePoint(arr).then(function(p){
-    if(!p){ showToast('Adresse introuvable — ouverture de Plans','err'); window.location.href='http://maps.apple.com/?daddr='+encodeURIComponent(arr)+'&dirflg=d'; return; }
-    window.location.href='com.sygic.aura://coordinate|'+p.lon+'|'+p.lat+'|drive';
-  }).catch(function(){ showToast('Réseau indisponible — ouverture de Plans','err'); window.location.href='http://maps.apple.com/?daddr='+encodeURIComponent(arr)+'&dirflg=d'; });
-}
+function itSygicDirect(){ itSygicGo(); }
 function itWaze(){
   var arr=gv('it-arr'); if(!arr){ showToast('Saisissez une arrivée','err'); return; }
   if(itLastResult&&itLastResult.arr){ window.location.href='https://waze.com/ul?ll='+itLastResult.arr.lat+','+itLastResult.arr.lon+'&navigate=yes'; return; }
